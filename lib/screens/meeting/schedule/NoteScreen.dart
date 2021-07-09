@@ -1,10 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:jagu_meet/model/note.dart';
+import 'package:jagu_meet/firebase/ads/admobAds.dart';
+import 'package:jagu_meet/firebase/databases/usersCloudDb.dart';
 import 'package:jagu_meet/widgets/cupertinoSwitchListTile.dart';
 import 'package:jagu_meet/widgets/dialogs.dart';
-import '../../../utils/databasehelper_scheduled.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import '../../../theme/theme.dart';
 import '../../../theme/themeNotifier.dart';
@@ -13,15 +14,42 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jagu_meet/classes/focusNode.dart';
 
 class NoteScreen extends StatefulWidget {
-  final Note2 note2;
-  NoteScreen(this.note2);
+  final uid;
+  final email;
+  final id;
+  final meetName;
+  final date;
+  final from;
+  final to;
+  final ch;
+  final live;
+  final record;
+  final raise;
+  final yt;
+  final repeat;
+  final kick;
+  NoteScreen(this.uid,
+  this.email,
+  this.id,
+      this.meetName,
+  this.date,
+  this.from,
+  this.to,
+      this.repeat,
+  this.ch,
+  this.live,
+  this.record,
+  this.raise,
+  this.yt,
+  this.kick);
 
   @override
   State<StatefulWidget> createState() => new _NoteScreenState();
 }
 
 class _NoteScreenState extends State<NoteScreen> {
-  DatabaseHelper2 db2 = new DatabaseHelper2();
+  DatabaseService databaseService = new DatabaseService();
+  AdHelper adHelper = new AdHelper();
 
   TextEditingController _titleController;
   TextEditingController _descriptionController;
@@ -41,20 +69,22 @@ class _NoteScreenState extends State<NoteScreen> {
   @override
   void initState() {
     super.initState();
-    _titleController = new TextEditingController(text: widget.note2.title2);
+    _titleController = new TextEditingController(text: widget.meetName);
     _descriptionController = new TextEditingController(
-      text: widget.note2.description2,
+      text: widget.id,
     );
-    _dateController = new TextEditingController(text: widget.note2.date2);
-    _fromController = new TextEditingController(text: widget.note2.from2);
-    _toController = new TextEditingController(text: widget.note2.to2);
-    repeat = widget.note2.repeat;
-    chatEnabled = widget.note2.chatEnabled2;
-    liveEnabled = widget.note2.liveEnabled2;
-    recordEnabled = widget.note2.recordEnabled2;
-    raiseEnabled = widget.note2.raiseEnabled2;
-    shareYtEnabled = widget.note2.shareYtEnabled2;
-    kickOutEnabled = widget.note2.kickOutEnabled2;
+    _dateController = new TextEditingController(text: widget.date.toString());
+    _fromController = new TextEditingController(text: widget.from);
+    _toController = new TextEditingController(text: widget.to);
+    repeat = widget.repeat;
+    chatEnabled = widget.ch;
+    liveEnabled = widget.live;
+    recordEnabled = widget.record;
+    raiseEnabled = widget.raise;
+    shareYtEnabled = widget.yt;
+    kickOutEnabled = widget.kick;
+    adHelper.interstitialAdload();
+    checkExists();
     isEmpty();
   }
 
@@ -169,12 +199,31 @@ class _NoteScreenState extends State<NoteScreen> {
     }
   }
 
+  bool exists = false;
+  checkExists() async {
+    try {
+      await FirebaseFirestore.instance.doc("Users/${widget.uid}/Scheduled/${widget.id}").get().then((doc) {
+        if (doc.exists) {
+          setState(() {
+            exists = true;
+          });
+        } else {
+          setState(() {
+            exists = false;
+          });
+        }});
+
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
-    return MaterialApp(
-      theme: themeNotifier.getTheme(),
-      home: Scaffold(
+    return Theme(
+      data: themeNotifier.getTheme(),
+      child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(
@@ -196,7 +245,7 @@ class _NoteScreenState extends State<NoteScreen> {
               ),
               preferredSize: Size(double.infinity, 0.0)),
           title: Text(
-            'Schedule a Meeting',
+    exists == false ? 'Schedule a Meeting' : 'Edit Meeting',
             style: TextStyle(
               color: themeNotifier.getTheme() == darkTheme
                   ? Colors.white : Colors.black54,
@@ -204,46 +253,42 @@ class _NoteScreenState extends State<NoteScreen> {
           ),
           actions: [
             IconButton(
-              icon: (widget.note2.id2 != null)
+              icon: exists
                   ? Icon(
-                      Icons.edit,
+                      Icons.edit_outlined,
                       color:
-                          isButtonEnabled ? Colors.white : Colors.transparent,
+                          isButtonEnabled ? themeNotifier.getTheme() == darkTheme
+                              ? Colors.white : Colors.black54 : Colors.transparent,
                     )
                   : Icon(
                       Icons.add,
                       color:
-                          isButtonEnabled ? Colors.white : Colors.transparent,
+                          isButtonEnabled ? themeNotifier.getTheme() == darkTheme
+                              ? Colors.white : Colors.black54 : Colors.transparent,
                     ),
               onPressed: isButtonEnabled
                   ? () {
                       check();
-                      if (widget.note2.id2 != null) {
+                      if (exists == true) {
                         if (_descriptionController.text.length >= 10) {
                           if (_titleController.text.isNotEmpty) {
                             if (_dateController.text.isNotEmpty) {
                               if (_fromController.text.isNotEmpty) {
                                 if (_toController.text.isNotEmpty) {
-                                  db2
-                                      .updateNote2(Note2.fromMap({
-                                    'id2': widget.note2.id2,
-                                    'title2': _titleController.text,
-                                    'description2': _descriptionController.text,
-                                    'date2': _dateController.text,
-                                    'from2': _fromController.text,
-                                    'to2': _toController.text,
-                                    'repeat': repeat,
-                                    'chatEnabled2': chatEnabled,
-                                    'liveEnabled2': liveEnabled,
-                                    'recordEnabled2': recordEnabled,
-                                    'raiseEnabled2': raiseEnabled,
-                                    'shareYtEnabled': shareYtEnabled,
-                                    'kickOutEnabled': kickOutEnabled
-                                  }))
+                                  databaseService.updateScheduledHosted(widget.uid, _descriptionController.text, _titleController.text, _dateController.text, _fromController.text, _toController.text
+                                      , repeat, chatEnabled, liveEnabled, recordEnabled, raiseEnabled, shareYtEnabled, kickOutEnabled, widget.email, false)
                                       .then((_) {
-                                    Navigator.pop(context, 'update');
+                                    Navigator.pop(context);
                                   });
-                                  ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text('Schedule updated',)));
+                                  Fluttertoast.showToast(
+                                      msg: 'Meeting updated',
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.SNACKBAR,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.black,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0);
+                                  adHelper.showInterstitialAd();
                                 }
                               }
                             }
@@ -256,23 +301,9 @@ class _NoteScreenState extends State<NoteScreen> {
                             if (_dateController.text.isNotEmpty) {
                               if (_fromController.text.isNotEmpty) {
                                 if (_toController.text.isNotEmpty) {
-                                  db2
-                                      .saveNote2(Note2(
-                                    _titleController.text,
-                                    _descriptionController.text,
-                                    _dateController.text,
-                                    _fromController.text,
-                                    _toController.text,
-                                    repeat,
-                                    chatEnabled,
-                                    liveEnabled,
-                                    recordEnabled,
-                                    raiseEnabled,
-                                    shareYtEnabled,
-                                    kickOutEnabled,
-                                  ))
+                                  databaseService.addScheduledHosted(false, widget.uid, widget.email, _descriptionController.text, _titleController.text, _dateController.text, _fromController.text, _toController.text, repeat, chatEnabled, liveEnabled, recordEnabled, raiseEnabled, shareYtEnabled, kickOutEnabled)
                                       .then((_) {
-                                    Navigator.pop(context, 'save');
+                                    Navigator.pop(context);
                                   });
                                   Fluttertoast.showToast(
                                       msg: 'Meeting Scheduled',
@@ -282,6 +313,7 @@ class _NoteScreenState extends State<NoteScreen> {
                                       backgroundColor: Colors.black,
                                       textColor: Colors.white,
                                       fontSize: 16.0);
+                                  adHelper.showInterstitialAd();
                                 }
                               }
                             }
@@ -295,8 +327,6 @@ class _NoteScreenState extends State<NoteScreen> {
         ),
         body: SafeArea(
           child: Container(
-            height: double.maxFinite,
-            alignment: Alignment.topCenter,
             child: SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -608,7 +638,7 @@ class _NoteScreenState extends State<NoteScreen> {
                     ),
                     dense: true,
                     subtitle: Text('Allow participants to chat in meeting', overflow: TextOverflow.ellipsis,),
-                    value: chatEnabled == 0 ? false : true,
+                    value: chatEnabled,
                     onChanged: onChatChanged,
                   ),
                   Divider(
@@ -628,7 +658,7 @@ class _NoteScreenState extends State<NoteScreen> {
                     ),
                     dense: true,
                     subtitle: Text('Allow participants to raise hand', overflow: TextOverflow.ellipsis,),
-                    value: raiseEnabled == 0 ? false : true,
+                    value: raiseEnabled,
                     onChanged: onRaiseChanged,
                   ),
                   Divider(
@@ -649,7 +679,7 @@ class _NoteScreenState extends State<NoteScreen> {
                     subtitle: Text(
                         'Allow participants to share YouTube video in meeting', overflow: TextOverflow.ellipsis,),
                     dense: true,
-                    value: shareYtEnabled == 0 ? false : true,
+                    value: shareYtEnabled,
                     onChanged: onYtChanged,
                   ),
                   Divider(
@@ -669,7 +699,7 @@ class _NoteScreenState extends State<NoteScreen> {
                     ),
                     dense: true,
                     subtitle: Text('Allow Participants to record meeting', overflow: TextOverflow.ellipsis,),
-                    value: recordEnabled == 0 ? false : true,
+                    value: recordEnabled,
                     onChanged: onRecordChanged,
                   ),
                   Divider(
@@ -689,7 +719,7 @@ class _NoteScreenState extends State<NoteScreen> {
                     ),
                     subtitle: Text('Allow participants to live stream meeting', overflow: TextOverflow.ellipsis,),
                     dense: true,
-                    value: liveEnabled == 0 ? false : true,
+                    value: liveEnabled,
                     onChanged: onLiveChanged,
                   ),
                   Divider(
@@ -710,7 +740,7 @@ class _NoteScreenState extends State<NoteScreen> {
                     subtitle: Text(
                         'Allow participants to kick ou each other in meeting', overflow: TextOverflow.ellipsis,),
                     dense: true,
-                    value: kickOutEnabled == 0 ? false : true,
+                    value: kickOutEnabled,
                     onChanged: onKickChanged,
                   ),
                   Divider(
@@ -831,30 +861,12 @@ class _NoteScreenState extends State<NoteScreen> {
   onChatChanged(bool value) {
     setState(() {
       chatEnabled = value;
-      if (value == false) {
-        setState(() {
-          chatEnabled = 0;
-        });
-      } else {
-        setState(() {
-          chatEnabled = 1;
-        });
-      }
     });
   }
 
   onYtChanged(bool value) {
     setState(() {
       shareYtEnabled = value;
-      if (value == false) {
-        setState(() {
-          shareYtEnabled = 0;
-        });
-      } else {
-        setState(() {
-          shareYtEnabled = 1;
-        });
-      }
     });
   }
 
@@ -868,31 +880,13 @@ class _NoteScreenState extends State<NoteScreen> {
           'No');
       if (action == DialogAction.yes) {
         setState(() {
-          kickOutEnabled = value;
-          if (value == false) {
-            setState(() {
-              kickOutEnabled = 0;
-            });
-          } else {
-            setState(() {
-              kickOutEnabled = 1;
-            });
-          }
+          kickOutEnabled = true;
         });
       }
       if (action == DialogAction.abort) {}
     } else {
       setState(() {
-        kickOutEnabled = value;
-        if (value == false) {
-          setState(() {
-            kickOutEnabled = 0;
-          });
-        } else {
-          setState(() {
-            kickOutEnabled = 1;
-          });
-        }
+        kickOutEnabled = false;
       });
     }
   }
@@ -907,31 +901,13 @@ class _NoteScreenState extends State<NoteScreen> {
           'No');
       if (action == DialogAction.yes) {
         setState(() {
-          liveEnabled = value;
-          if (value == false) {
-            setState(() {
-              liveEnabled = 0;
-            });
-          } else {
-            setState(() {
-              liveEnabled = 1;
-            });
-          }
+          liveEnabled = true;
         });
       }
       if (action == DialogAction.abort) {}
     } else {
       setState(() {
-        liveEnabled = value;
-        if (value == false) {
-          setState(() {
-            liveEnabled = 0;
-          });
-        } else {
-          setState(() {
-            liveEnabled = 1;
-          });
-        }
+        liveEnabled = false;
       });
     }
   }
@@ -945,29 +921,14 @@ class _NoteScreenState extends State<NoteScreen> {
           'Allow',
           'No');
       if (action == DialogAction.yes) {
-        if (value == false) {
-          setState(() {
-            recordEnabled = 0;
-          });
-        } else {
-          setState(() {
-            recordEnabled = 1;
-          });
-        }
+        setState(() {
+          recordEnabled = true;
+        });
       }
       if (action == DialogAction.abort) {}
     } else {
       setState(() {
-        recordEnabled = value;
-        if (value == false) {
-          setState(() {
-            recordEnabled = 0;
-          });
-        } else {
-          setState(() {
-            recordEnabled = 1;
-          });
-        }
+        recordEnabled = false;
       });
     }
   }
@@ -975,15 +936,6 @@ class _NoteScreenState extends State<NoteScreen> {
   onRaiseChanged(bool value) {
     setState(() {
       raiseEnabled = value;
-      if (value == false) {
-        setState(() {
-          raiseEnabled = 0;
-        });
-      } else {
-        setState(() {
-          raiseEnabled = 1;
-        });
-      }
     });
   }
 }

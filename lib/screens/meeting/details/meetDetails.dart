@@ -7,10 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:jagu_meet/databases/usersCloudDb.dart';
+import 'package:jagu_meet/firebase/ads/admobAds.dart';
+import 'package:jagu_meet/firebase/databases/usersCloudDb.dart';
 import 'package:jagu_meet/screens/meeting/details/participants.dart';
 import 'package:jagu_meet/theme/theme.dart';
 import 'package:jagu_meet/theme/themeNotifier.dart';
+import 'package:jagu_meet/widgets/dialogs.dart';
 import 'package:jagu_meet/widgets/loading.dart';
 import 'package:jitsi_meet/jitsi_meet.dart';
 import 'package:package_info/package_info.dart';
@@ -59,11 +61,13 @@ class _meetDetailsState extends State<meetDetails> {
   bool inMeeting = false;
 
   DatabaseService databaseService = new DatabaseService();
+  AdHelper adHelper = new AdHelper();
 
   @override
   void initState() {
     super.initState();
     getSettings();
+    adHelper.interstitialAdload();
     getDevice();
     getAppInfo();
   }
@@ -233,9 +237,7 @@ class _meetDetailsState extends State<meetDetails> {
                                 .size
                                 .width * 0.90,
                             child: RaisedButton(
-                                color: themeNotifier.getTheme() == darkTheme
-                                    ? Color(0xff0184dc)
-                                    : Colors.blue,
+                                color: Color(0xff0184dc),
                                 disabledColor: themeNotifier.getTheme() ==
                                     darkTheme
                                     ? Color(0xFF242424)
@@ -341,8 +343,10 @@ class _meetDetailsState extends State<meetDetails> {
                                       fontWeight: FontWeight.bold),
                                 )),
                           ) : Container(),
-                          SizedBox(
+                          widget.db == 'host' ? SizedBox(
                             height: 30,
+                          ) : SizedBox(
+                            height: 15,
                           ),
                           SizedBox(
                             height: 50.0,
@@ -368,15 +372,35 @@ class _meetDetailsState extends State<meetDetails> {
                                 ),
                                 onPressed: () async {
                                   if (widget.db == 'host') {
+                                  final action = await Dialogs.redAlertDialog(
+                                      context,
+                                      'Release Meeting',
+                                      'Do you really want to release your meeting? Your meeting will be deleted forever and you will no more own it',
+                                      'Release',
+                                      'Cancel');
+                                  if (action == DialogAction.yes) {
                                     databaseService.removeMyHosted(id, widget.uid);
-                                    Navigator.pop(context);
+                                    Navigator.of(context).pop();
+                                  }
+                                  if (action == DialogAction.abort) {}
                                   } else {
-                                    databaseService.removeMyJoined(id, widget.uid);
+                                    final action = await Dialogs.redAlertDialog(
+                                        context,
+                                        'Delete Meeting',
+                                        'Do You Really want to delete this meeting from your recent joined list?',
+                                        'Delete',
+                                        'Cancel');
+                                    if (action == DialogAction.yes) {
+                                      databaseService.removeMyJoined(id, widget.uid);
+                                      adHelper.showInterstitialAd();
+                                      Navigator.of(context).pop();
+                                    }
+                                    if (action == DialogAction.abort) {}
                                     Navigator.pop(context);
                                   }
                                 },
                                 child: Text(
-                                  'Delete',
+                                  widget.db == 'host' ? 'Release' : 'Delete',
                                   style: TextStyle(
                                       fontSize: 17,
                                       fontWeight: FontWeight.bold),
@@ -569,7 +593,7 @@ class _meetDetailsState extends State<meetDetails> {
                 fontSize: 16.0);
             debugPrint("${options.room} will join with message: $message");
           }, onConferenceJoined: (message) async {
-            databaseService.addMyJoined(options.room, widget.uid, options.subject, DateTime.now().subtract(Duration(seconds: 2)), widget.name, widget.email);
+            databaseService.addMyJoined(options.room, widget.uid, options.subject, DateTime.now().subtract(Duration(seconds: 2)), widget.name, widget.email, widget.PhotoUrl);
             setState(() {
               inMeeting = true;
             });
@@ -597,6 +621,7 @@ class _meetDetailsState extends State<meetDetails> {
                 backgroundColor: Colors.black,
                 textColor: Colors.white,
                 fontSize: 16.0);
+            adHelper.showInterstitialAd();
             meetFeedback();
             debugPrint("${options.room} terminated with message: $message");
           }, onPictureInPictureWillEnter: (message) {
@@ -751,13 +776,7 @@ class _meetDetailsState extends State<meetDetails> {
                   "Meeting Topic - ${options.subject}.  "
                   "\n"
                   "\n"
-                  "Android Meeting URL - $dynamicLink  "
-                  "\n"
-                  "\n"
-                  "IOS and PC Meeting URL - $dynamicWeb "
-                  "\n"
-                  "\n"
-                  "Meeting Password - Host will share separately. ";
+                  "Meeting URL - $dynamicLink  ";
               copyInvite(textshare);
             } else {}
             debugPrint("${options.room} joined with message: $message");
@@ -784,6 +803,7 @@ class _meetDetailsState extends State<meetDetails> {
                 backgroundColor: Colors.black,
                 textColor: Colors.white,
                 fontSize: 16.0);
+            adHelper.showInterstitialAd();
             meetFeedback();
             debugPrint("${options.room} terminated with message: $message");
           }, onPictureInPictureWillEnter: (message) {
@@ -843,13 +863,7 @@ class _meetDetailsState extends State<meetDetails> {
               "Meeting Topic - $topics.  "
               "\n"
               "\n"
-              "Android Meeting URL - $androidUrl  "
-              "\n"
-              "\n"
-              "IOS and PC Meeting URL - $url "
-              "\n"
-              "\n"
-              "Meeting Password - Host will share separately. ";
+              "Meeting URL - $androidUrl  ";
           final RenderBox box = context.findRenderObject();
           Share.share(textshare,
               subject:
@@ -907,9 +921,7 @@ class _meetDetailsState extends State<meetDetails> {
             child: Text(
               'Submit',
               style: TextStyle(
-                color: themeNotifier.getTheme() == darkTheme
-                    ? Color(0xff0184dc)
-                    : Colors.blue,
+                color: Color(0xff0184dc)
               ),
             ),
             onPressed: () {
@@ -925,11 +937,6 @@ class _meetDetailsState extends State<meetDetails> {
                           'User Details: '
                           '\n'
                           'Running on device: $deviceData.  '
-                          '\n'
-                          'user id: ${widget.uid} .  '
-                          '\n'
-                          'email: ${widget.email} .  '
-                          '\n'
                           '\n'
                           'app version: $version .  '
                           '\n'
@@ -1004,6 +1011,10 @@ class _meetDetailsState extends State<meetDetails> {
         packageName: 'com.jaguweb.jagu_meet',
         minimumVersion: int.parse(packageInfo.buildNumber),
       ),
+      iosParameters: IosParameters(
+          fallbackUrl: Uri.parse('https://jmeet-8e163.web.app/'),
+          ipadFallbackUrl: Uri.parse('https://jmeet-8e163.web.app/'),
+          bundleId: ''),
       googleAnalyticsParameters: GoogleAnalyticsParameters(
         campaign: 'Video Conference',
         medium: 'Social',

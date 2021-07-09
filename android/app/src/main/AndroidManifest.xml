@@ -11,17 +11,19 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name='android.permission.VIBRATE'/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application
-        tools:replace="android:label"
+        tools:replace="android:label,android:allowBackup"
         android:name="io.flutter.app.FlutterApplication"
         android:label="Just Meet"
         android:icon="@mipmap/ic_launcher"
         android:largeHeap="true"
         android:usesCleartextTraffic="true"
         android:showWhenLocked="true"
-        android:turnScreenOn="true">
+        android:turnScreenOn="true"
+        android:allowBackup="false">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-8291736987357865~8542528097"/>
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@mipmap/ic_stat_notification" />

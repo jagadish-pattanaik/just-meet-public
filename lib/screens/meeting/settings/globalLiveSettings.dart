@@ -44,9 +44,9 @@ class _GlobalSettingsState extends State<GlobalSettings> {
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
-    return MaterialApp(
-      theme: themeNotifier.getTheme(),
-      home: Scaffold(
+    return Theme(
+      data: themeNotifier.getTheme(),
+      child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(
@@ -68,7 +68,7 @@ class _GlobalSettingsState extends State<GlobalSettings> {
               ),
               preferredSize: Size(double.infinity, 0.0)),
           title: Text(
-            'Global Meet Settings',
+            'Conference Settings',
             style: TextStyle(
               color: themeNotifier.getTheme() == darkTheme
                   ? Colors.white : Colors.black54,

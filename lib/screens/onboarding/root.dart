@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:jagu_meet/screens/meetweb/landingPage.dart';
 import 'package:jagu_meet/screens/onboarding/ppolicy.dart';
 import '../user/loginPage.dart';
 import 'package:jagu_meet/main.dart';
@@ -53,7 +54,11 @@ class _rootState extends State<root> {
         return PriPolicy();
       }
     } else {
-        return LoginScreen();
+      //if (Platform.isAndroid) {
+     //   return OpenApp();
+     // } else {
+        return LandingPage();
+     // }
     }
   }
 }

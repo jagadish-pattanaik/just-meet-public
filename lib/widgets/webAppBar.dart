@@ -1,9 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:jagu_meet/screens/meeting/meetweb/webFeedback.dart';
-import 'package:jagu_meet/screens/meeting/meetweb/webReport.dart';
-import 'package:jagu_meet/screens/meeting/meetweb/webSettings.dart';
+import 'package:jagu_meet/screens/meetweb/webFeedback.dart';
+import 'package:jagu_meet/screens/meetweb/webHost.dart';
+import 'package:jagu_meet/screens/meetweb/webReport.dart';
+import 'package:jagu_meet/screens/meetweb/webSettings.dart';
 import 'package:jagu_meet/screens/user/profilePage.dart';
 import 'package:jagu_meet/theme/theme.dart';
 import 'package:jagu_meet/theme/themeNotifier.dart';
@@ -113,9 +114,45 @@ class WebAppBar extends StatelessWidget {
             ),
           ),
           ),
+          DefaultButton(
+            text: "New Meeting",
+            press: () {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                      settings: RouteSettings(name: '/host'),
+                      builder: (context) =>
+                          WebHost(name: name, email: email, url: url, uid: uid,)));
+
+            },
+          ),
         ],
       ),
     );
   }
 }
 
+class DefaultButton extends StatelessWidget {
+  final String text;
+  final Function press;
+  const DefaultButton({
+    Key key,
+    this.text,
+    this.press,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(25),
+      child: FlatButton(
+        padding: EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+        color: Color(0xff0184dc),
+        onPressed: press,
+        child: Text(
+          text.toUpperCase(),
+        ),
+      ),
+    );
+  }
+}

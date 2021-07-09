@@ -1,7 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:jagu_meet/firebase/databases/appCloudDb.dart';
 import 'package:jagu_meet/theme/theme.dart';
 import 'package:jagu_meet/theme/themeNotifier.dart';
 import 'package:jagu_meet/widgets/dialogs.dart';
@@ -31,6 +34,8 @@ class _profilePageState extends State<profilePage> {
   String _userEmail;
   var _userPhotoUrl;
 
+  AppCloudService appService  = new AppCloudService();
+
   onSignOut() async {
     await SharedPreferences.getInstance().then((prefs) {
       prefs.setBool('signStatus', false);
@@ -53,16 +58,16 @@ class _profilePageState extends State<profilePage> {
   @override
   Widget build(BuildContext context) {
     final GoogleSignIn _gSignIn = GoogleSignIn();
+    final FirebaseAuth auth = FirebaseAuth.instance;
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
     setState(() {
       _userName = widget.name;
       _userEmail = widget.email;
       _userPhotoUrl = widget.photoURL;
     });
-    return MaterialApp(
-      title: 'Just Meet',
-      theme: themeNotifier.getTheme(),
-      home: Scaffold(
+    return Theme(
+      data: themeNotifier.getTheme(),
+      child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(
@@ -179,40 +184,47 @@ class _profilePageState extends State<profilePage> {
                         : Color(0xFFf9f9f9),
                     title: Text('Plan'),
                     subtitle: Text('Free'),
-                    onTap: () =>  Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                            builder: (context) => Information(
-                              text: 'Completely free and unlimited plan. Neither ads are shown nor your user data is sold for profit. Your love and support is our greatest motivation.',
-                              title: 'Plan',
-                            ))),
-                    trailing: Icon(
+                    onTap: () async {
+                      final plan = await appService.getPlan();
+                      Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                              builder: (context) => Information(
+                                text: plan,
+                                title: 'Plan',
+                              )));
+                      },
+                      trailing: Icon(
                       Icons.arrow_forward_ios,
                       size: 20,
                       color: Colors.grey,
-                    ),
-                  ),
-                  Divider(
-                    height: 1,
-                    color: themeNotifier.getTheme() == darkTheme
-                        ? Color(0xFF303030)
-                        : Colors.black12,
-                    indent: 15,
-                    endIndent: 0,
-                  ),
-                  ListTile(
-                    tileColor: themeNotifier.getTheme() == darkTheme
-                        ? Color(0xFF191919)
+                      ),
+                      ),
+                      Divider(
+                      height: 1,
+                      color: themeNotifier.getTheme() == darkTheme
+                      ? Color(0xFF303030)
+                          : Colors.black12,
+                      indent: 15,
+                      endIndent: 0,
+                      ),
+                      ListTile(
+                      tileColor: themeNotifier.getTheme() == darkTheme
+                      ? Color
+                    (0xFF191919)
                         : Color(0xFFf9f9f9),
                     title: Text('License'),
                     subtitle: Text('Unlimited Time and Participants'),
-                    onTap: () =>  Navigator.push(
+                    onTap: () async {
+    final license = await appService.getLicense();
+    Navigator.push(
                         context,
                         CupertinoPageRoute(
                             builder: (context) => Information(
-                              text: "You have been given unlimited meeting time and participants number without compromising quality and security. Your meetings are encrypted even Just Meet can't see them. So enjoy your unlimited free meetings.",
+                              text: license,
                               title: 'License',
-                            ))),
+                            )));
+                    },
                     trailing: Icon(
                       Icons.arrow_forward_ios,
                       size: 20,
@@ -239,7 +251,7 @@ class _profilePageState extends State<profilePage> {
                         ? Color(0xFF191919)
                         : Color(0xFFf9f9f9),
                     onTap: () async {
-                      final action = await Dialogs.yesAbortDialog(
+                      final action = await Dialogs.redAlertDialog(
                           context,
                           'Sign Out ?',
                           'Do you want to Sign Out from this account?',
@@ -247,13 +259,21 @@ class _profilePageState extends State<profilePage> {
                           'No');
                       if (action == DialogAction.yes) {
                         _gSignIn.signOut();
+                        auth.signOut();
                         onSignOut();
                         Navigator.of(context).pushAndRemoveUntil(
                           CupertinoPageRoute(
                               builder: (BuildContext context) => LoginScreen()),
                           (Route<dynamic> route) => false,
                         );
-                        ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text('Signed Out',)));
+                        Fluttertoast.showToast(
+                            msg: 'Signed Out',
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.SNACKBAR,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
                       }
                       if (action == DialogAction.abort) {}
                     },

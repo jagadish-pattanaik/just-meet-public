@@ -48,10 +48,9 @@ class _advancedSettingsState extends State<advancedSettings> {
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
-    return MaterialApp(
-      title: 'Just Meet',
-      theme: themeNotifier.getTheme(),
-      home: Scaffold(
+    return Theme(
+      data: themeNotifier.getTheme(),
+      child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(

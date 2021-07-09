@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_offline/flutter_offline.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -40,17 +41,23 @@ class WebViewState extends State<AppWebView> {
   checkConnection() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.none) {
-      ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text('No internet connection!',)));
+      Fluttertoast.showToast(
+          msg: 'No internet connection',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);;
     } else {}
   }
 
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: themeNotifier.getTheme(),
-      home: Scaffold(
+    return Theme(
+      data: themeNotifier.getTheme(),
+      child: Scaffold(
         appBar: AppBar(
           title: Text(
             title,
@@ -163,7 +170,14 @@ class WebViewState extends State<AppWebView> {
                 if (await canLaunch(url)) {
                   await launch(url);
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text('No internet connection!',)));
+                  Fluttertoast.showToast(
+                      msg: 'No internet connection',
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.SNACKBAR,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.black,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
                 }
                 Navigator.pop(context,);
               },

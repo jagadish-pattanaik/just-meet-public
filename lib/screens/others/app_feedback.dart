@@ -1,5 +1,7 @@
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:jagu_meet/firebase/databases/appCloudDb.dart';
 //import 'package:jagu_meet/sever_db/app_feedback/app_db_controller.dart';
 //import 'package:jagu_meet/sever_db/app_feedback/app_feedback_db.dart';
 import 'package:jagu_meet/theme/theme.dart';
@@ -23,13 +25,21 @@ class AppFeedback extends StatefulWidget {
 class _AppFeedbackState extends State<AppFeedback> {
   FocusNode myFocusNode = FocusNode();
   final reportText = TextEditingController();
+  AppCloudService appService  = new AppCloudService();
 
   _launchURL(String toMailId, String subject, String body) async {
     var url = 'mailto:$toMailId?subject=$subject&body=$body';
     if (await canLaunch(url)) {
       await launch(url);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text('No internet connection!',)));
+      Fluttertoast.showToast(
+          msg: 'No internet connection',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 
@@ -85,11 +95,9 @@ class _AppFeedbackState extends State<AppFeedback> {
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
     final bool showFab = MediaQuery.of(context).viewInsets.bottom == 0.0;
-    return MaterialApp(
-      title: 'Just Meet',
-      debugShowCheckedModeBanner: false,
-      theme: themeNotifier.getTheme(),
-      home: Scaffold(
+    return Theme(
+      data: themeNotifier.getTheme(),
+      child: Scaffold(
         appBar: AppBar(
           iconTheme: IconThemeData(color: themeNotifier.getTheme() == darkTheme
               ? Colors.white : Colors.black54),
@@ -132,20 +140,14 @@ class _AppFeedbackState extends State<AppFeedback> {
                   '\n'
                   'Running on device: $deviceData'
                   '\n'
-                  'app version: $version.  '
-                  '\n'
-                  'user id: ${widget.userid}'
-                  '\n'
-                  'email: ${widget.email}'),
+                  'app version: $version.  '),
           label: Text('Contact Us',
               style: TextStyle(
                   color:  Colors.white,
                   fontWeight: FontWeight.bold)),
           icon: Icon(Icons.mail_outline,
               color: Colors.white),
-          backgroundColor: themeNotifier.getTheme() == darkTheme
-              ? Color(0xff0184dc)
-              : Colors.blue,
+          backgroundColor: Color(0xff0184dc)
         ) : Container(),
         body: SafeArea(
           child: Container(
@@ -211,9 +213,17 @@ class _AppFeedbackState extends State<AppFeedback> {
                       ),
                       onPressed: isButtonEnabled
                           ? () async {
-                              // _submitFeedbackData(widget.email, widget.name, reportText.text);
-                        ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text('Thank you for your feedback',)));
+                              appService.addFeedback(widget.userid, widget.email, reportText.text);
+                        Fluttertoast.showToast(
+                            msg: 'Thank you for your feedback',
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.SNACKBAR,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
                               reportText.clear();
+                              isEmpty();
                             }
                           : null,
                       child: Text(
@@ -221,9 +231,7 @@ class _AppFeedbackState extends State<AppFeedback> {
                         style: TextStyle(
                             fontSize: 17, fontWeight: FontWeight.bold),
                       ),
-                      color: themeNotifier.getTheme() == darkTheme
-                          ? Color(0xff0184dc)
-                          : Colors.blue,
+                      color: Color(0xff0184dc)
                     ),
                   ),
                   SizedBox(

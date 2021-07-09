@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:grouped_buttons/grouped_buttons.dart';
+import 'package:jagu_meet/firebase/databases/appCloudDb.dart';
 //import 'package:jagu_meet/sever_db/report_abuse/report_db.dart';
 //import 'package:jagu_meet/sever_db/report_abuse/report_db_controller.dart';
 import 'package:jagu_meet/theme/theme.dart';
@@ -25,6 +27,8 @@ class _ReportState extends State<Report> {
   FocusNode myFocusNode = FocusNode();
   final reportText = TextEditingController();
 
+  AppCloudService appService  = new AppCloudService();
+
   var rType = "Others";
 
   _launchURL(String toMailId, String subject, String body) async {
@@ -32,7 +36,14 @@ class _ReportState extends State<Report> {
     if (await canLaunch(url)) {
       await launch(url);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text('No internet connection!',)));
+      Fluttertoast.showToast(
+          msg: 'No internet connection',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 
@@ -64,11 +75,9 @@ class _ReportState extends State<Report> {
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
     final bool showFab = MediaQuery.of(context).viewInsets.bottom == 0.0;
-    return MaterialApp(
-      title: 'Just Meet',
-      debugShowCheckedModeBanner: false,
-      theme: themeNotifier.getTheme(),
-      home: Scaffold(
+    return Theme(
+      data: themeNotifier.getTheme(),
+      child: Scaffold(
         appBar: AppBar(
           iconTheme: IconThemeData(color: themeNotifier.getTheme() == darkTheme
               ? Colors.white : Colors.black54),
@@ -114,23 +123,14 @@ class _ReportState extends State<Report> {
                   '\n'
                   'time:'
                   '\n'
-                  'Any other data:'
-                  '\n'
-                  '\n'
-                  'User Details:'
-                  '\n'
-                  'user id: ${widget.userid}'
-                  '\n'
-                  'email: ${widget.email}'),
+                  'Any other data:'),
           label: Text('Contact Us',
               style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold)),
           icon: Icon(Icons.mail_outline,
               color: Colors.white),
-          backgroundColor: themeNotifier.getTheme() == darkTheme
-              ? Color(0xff0184dc)
-              : Colors.blue,
+          backgroundColor: Color(0xff0184dc)
         ) :  Container(),
         body: SafeArea(
           child: Container(
@@ -216,9 +216,17 @@ class _ReportState extends State<Report> {
                       ),
                       onPressed: isButtonEnabled
                           ? () {
-                              //_submitAbuseData(widget.email, widget.userid, rType, reportText.text);
-                        ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text('Reported',)));
+                              appService.addAbuseReport(widget.userid, widget.email, reportText.text);
+                        Fluttertoast.showToast(
+                            msg: 'Reported',
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.SNACKBAR,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
                               reportText.clear();
+                              isEmpty();
                             }
                           : null,
                       child: Text(
@@ -226,9 +234,7 @@ class _ReportState extends State<Report> {
                         style: TextStyle(
                             fontSize: 17, fontWeight: FontWeight.bold),
                       ),
-                      color: themeNotifier.getTheme() == darkTheme
-                          ? Color(0xff0184dc)
-                          : Colors.blue,
+                      color: Color(0xff0184dc)
                     ),
                   ),
                   SizedBox(

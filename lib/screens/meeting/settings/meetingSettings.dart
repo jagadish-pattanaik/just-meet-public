@@ -21,9 +21,9 @@ class _meetingSettingsState extends State<meetingSettings> {
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
-    return MaterialApp(
-      theme: themeNotifier.getTheme(),
-      home: Scaffold(
+    return Theme(
+      data: themeNotifier.getTheme(),
+      child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(
@@ -146,12 +146,12 @@ class _meetingSettingsState extends State<meetingSettings> {
                           ? Color(0xFF191919)
                           : Color(0xFFf9f9f9),
                       title: Text(
-                        "Global Meet Settings",
+                        "Conference Settings",
                         style: TextStyle(
                           fontSize: 16,
                         ),
                       ),
-                      subtitle: Text('Settings and customization for global live meetings you host', overflow: TextOverflow.ellipsis,),
+                      subtitle: Text('Settings and customization for conferences you host', overflow: TextOverflow.ellipsis,),
                       dense: true,
                       contentPadding:
                       EdgeInsets.symmetric(vertical: 0.0, horizontal: 10.0),

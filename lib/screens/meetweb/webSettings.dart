@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:jagu_meet/screens/meeting/settings/AdvancedSettings.dart';
 import 'package:jagu_meet/screens/meeting/settings/generalSettings.dart';
-import 'package:jagu_meet/screens/meeting/settings/meetingSettings.dart';
 import 'package:jagu_meet/theme/theme.dart';
 import 'package:jagu_meet/theme/themeNotifier.dart';
 import 'package:provider/provider.dart';
@@ -18,10 +17,9 @@ class _webSettingsState extends State<webSettings> {
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
-    return MaterialApp(
-      title: 'Just Meet | Settings',
-      theme: themeNotifier.getTheme(),
-      home: Scaffold(
+    return Theme(
+      data: themeNotifier.getTheme(),
+      child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(

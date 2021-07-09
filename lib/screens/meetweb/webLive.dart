@@ -1,50 +1,34 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jagu_meet/theme/theme.dart';
 import 'package:jagu_meet/theme/themeNotifier.dart';
 import 'package:provider/provider.dart';
 import 'package:random_string/random_string.dart';
 import 'package:responsive_builder/responsive_builder.dart';
+
 import 'meet.dart';
 
-class WebHost extends StatefulWidget {
+class WebLive extends StatefulWidget {
   final name;
   final email;
   final url;
-  const WebHost({Key key,
+  final uid;
+  const WebLive({Key key,
     this.name,
     this.email,
-    this.url,}) : super(key: key);
+    this.url,
+    this.uid}) : super(key: key);
 
   @override
-  _WebHostState createState() => _WebHostState(name, email, url);
+  _WebLiveState createState() => _WebLiveState();
 }
 
-class _WebHostState extends State<WebHost> {
-  final name;
-  final email;
-  final url;
-
-  _WebHostState(this.name, this.email, this.url);
-
-  String _userName;
-  String _userEmail;
-  var _userPhotoUrl;
-
+class _WebLiveState extends State<WebLive> {
   final roomText = TextEditingController();
   bool isTyping = false;
   bool isButtonEnabled;
-
-  getInfo() {
-    setState(() {
-      _userName = name;
-      _userEmail = email;
-      _userPhotoUrl = url;
-    });
-  }
 
   istyping(final TextEditingController controller) {
     if (controller.text.length > 0) {
@@ -73,14 +57,20 @@ class _WebHostState extends State<WebHost> {
   checkConnection() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.none) {
-      ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text('No internet connection!',)));
+      Fluttertoast.showToast(
+          msg: 'No internet connection',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
     } else {
     }
   }
 
   @override
   void initState() {
-    getInfo();
     isEmpty();
     super.initState();
   }
@@ -88,31 +78,30 @@ class _WebHostState extends State<WebHost> {
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
-    return MaterialApp(
-      title: 'Just Meet | Host',
-        theme: themeNotifier.getTheme(),
-        home: Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back_ios_sharp,
-              ),
-              onPressed: () => Navigator.of(context).pop(),
+    return Theme(
+      data: themeNotifier.getTheme(),
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_sharp,
             ),
-            iconTheme: IconThemeData(color: themeNotifier.getTheme() == darkTheme
-                ? Colors.white : Colors.black54),
-            backgroundColor: themeNotifier.getTheme() == darkTheme
-                ? Color(0xff0d0d0d)
-                : Color(0xffffffff),
-            elevation: 0,
+            onPressed: () => Navigator.of(context).pop(),
           ),
-          body: SafeArea(
-            child: Container(
-              height: double.maxFinite,
-              child: Center(
-                  child:
-                  ResponsiveBuilder(
-                      builder: (context, sizingInformation) => Container(
+          iconTheme: IconThemeData(color: themeNotifier.getTheme() == darkTheme
+              ? Colors.white : Colors.black54),
+          backgroundColor: themeNotifier.getTheme() == darkTheme
+              ? Color(0xff0d0d0d)
+              : Color(0xffffffff),
+          elevation: 0,
+        ),
+        body: SafeArea(
+          child: Container(
+            height: double.maxFinite,
+            child: Center(
+              child:
+              ResponsiveBuilder(
+                  builder: (context, sizingInformation) => Container(
                     height: double.maxFinite,
                     width: sizingInformation.deviceScreenType == DeviceScreenType.mobile || sizingInformation.deviceScreenType == DeviceScreenType.tablet
                         ? MediaQuery.of(context).size.width * 0.60 : MediaQuery.of(context).size.width * 0.30,
@@ -121,7 +110,7 @@ class _WebHostState extends State<WebHost> {
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text('Start a Meeting', style: TextStyle(
+                        Text('Start a Conference', style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
                         ),),
@@ -201,13 +190,12 @@ class _WebHostState extends State<WebHost> {
                             isButtonEnabled
                                 ? ()  {
                               String randomId = randomNumeric(11);
-                              copyInvite(randomId, roomText.text);
                               Navigator.push(
                                   context,
                                   CupertinoPageRoute(
                                       settings: RouteSettings(name: '/meeting'),
                                       builder: (context) =>
-                                          Meet(id: randomId, topic: roomText.text, name: _userName, email: _userEmail, url: _userPhotoUrl,)));
+                                          Meet(id: randomId, topic: roomText.text, name: widget.name, email: widget.email, url: widget.url, uid: widget.uid, type: 'live',)));
                             }
                                 : null,
                             child: Text(
@@ -215,26 +203,26 @@ class _WebHostState extends State<WebHost> {
                               style:
                               TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                             ),
-                            color: themeNotifier.getTheme() == darkTheme
-                                ? Color(0xff0184dc)
-                                : Colors.blue,
+                            color: Color(0xff0184dc),
                           ),
                         ),
                         SizedBox(
                           height: 20,
                         ),
                         Row(
-                          mainAxisSize: MainAxisSize.min,
+                            mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center, children: [
-                          Text(
-                            'Your invitation link will get copied when you start the meeting',
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.bold),
-                            textAlign: TextAlign.center,
-                          )
+                          Text('Once you start the meeting, Just Meet users from all over'
+                              '\n'
+                              ' the world will be able to see and join your meeting',
+                              maxLines: 3,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: themeNotifier.getTheme() == darkTheme
+                                    ? Colors.white
+                                    : Colors.grey,
+                              )),
                         ]),
                       ],
                     ),
@@ -243,26 +231,7 @@ class _WebHostState extends State<WebHost> {
             ),
           ),
         ),
-        ),
+      ),
     );
-  }
-
-  copyInvite(id, topic) {
-    String inviteText = "$_userName is inviting you to join a Just Meet meeting.  "
-        "\n"
-        "\n"
-        "Meeting Id - $id  "
-        "\n"
-        "Meeting Topic - $topic.  ";
-    Clipboard.setData(new ClipboardData(text: inviteText)).then((_) {
-      Fluttertoast.showToast(
-          msg: 'Copied Invite link to clipboard',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.SNACKBAR,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.black,
-          textColor: Colors.white,
-          fontSize: 16.0);
-    });
   }
 }

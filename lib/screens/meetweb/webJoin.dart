@@ -2,6 +2,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jagu_meet/theme/theme.dart';
 import 'package:jagu_meet/theme/themeNotifier.dart';
 import 'package:provider/provider.dart';
@@ -12,25 +13,29 @@ class WebJoin extends StatefulWidget {
   final name;
   final email;
   final url;
+  final uid;
   const WebJoin({Key key,
     this.name,
     this.email,
-    this.url,}) : super(key: key);
+    this.url,
+  this.uid}) : super(key: key);
 
   @override
-  _WebJoinState createState() => _WebJoinState(name, email, url);
+  _WebJoinState createState() => _WebJoinState(name, email, url, uid);
 }
 
 class _WebJoinState extends State<WebJoin> {
   final name;
   final email;
   final url;
+  final uid;
 
-  _WebJoinState(this.name, this.email, this.url);
+  _WebJoinState(this.name, this.email, this.url, this.uid);
 
   String _userName;
   String _userEmail;
   var _userPhotoUrl;
+  var _userUid;
 
   final roomText = TextEditingController();
   bool isTyping = false;
@@ -41,6 +46,7 @@ class _WebJoinState extends State<WebJoin> {
       _userName = name;
       _userEmail = email;
       _userPhotoUrl = url;
+      _userUid = uid;
     });
   }
 
@@ -71,7 +77,14 @@ class _WebJoinState extends State<WebJoin> {
   checkConnection() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.none) {
-      ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text('No internet connection!',)));
+      Fluttertoast.showToast(
+          msg: 'No internet connection',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
     } else {
     }
   }
@@ -86,10 +99,9 @@ class _WebJoinState extends State<WebJoin> {
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
-    return MaterialApp(
-      title: 'Just Meet | Join',
-      theme: themeNotifier.getTheme(),
-      home: Scaffold(
+    return Theme(
+      data: themeNotifier.getTheme(),
+      child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(
@@ -207,7 +219,7 @@ class _WebJoinState extends State<WebJoin> {
                                          CupertinoPageRoute(
                                              settings: RouteSettings(name: '/meeting'),
                                              builder: (context) =>
-                                                 Meet(id: roomText.text, topic: 'Just Meet', name: _userName, email: _userEmail, url: _userPhotoUrl,)));
+                                                 Meet(id: roomText.text, topic: 'Just Meet', name: _userName, email: _userEmail, url: _userPhotoUrl, uid: _userUid, type: 'join',)));
                                    }
                                   : null,
                               child: Text(
@@ -215,9 +227,7 @@ class _WebJoinState extends State<WebJoin> {
                                 style:
                                 TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                               ),
-                              color: themeNotifier.getTheme() == darkTheme
-                                  ? Color(0xff0184dc)
-                                  : Colors.blue,
+                              color: Color(0xff0184dc)
                             ),
                           ),
                           SizedBox(

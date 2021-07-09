@@ -7,22 +7,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:jagu_meet/main.dart';
-import 'package:jagu_meet/screens/meeting/meetweb/meetWeb.dart';
+import 'package:jagu_meet/screens/meetweb/meetWeb.dart';
 import 'package:jagu_meet/screens/others/webview.dart';
-//import 'package:jagu_meet/sever_db/users%20db/users_db.dart';
-//import 'package:jagu_meet/sever_db/users%20db/users_db_controller.dart';
 import 'package:jagu_meet/theme/theme.dart';
 import 'package:jagu_meet/theme/themeNotifier.dart';
 import 'package:jagu_meet/widgets/slider.dart';
-//import 'package:mobile_number/mobile_number.dart';
-//import 'package:mobile_number/sim_card.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:argon_buttons_flutter/argon_buttons_flutter.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:jagu_meet/firebase/databases/usersCloudDb.dart';
+import 'package:sign_button/sign_button.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -33,13 +29,23 @@ class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = new GoogleSignIn();
 
+  bool loading = false;
+
   var connectivityResult;
+
+  DatabaseService databaseService = new DatabaseService();
 
   checkConnection() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.none) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          new SnackBar(content: Text('No internet connection!',)));
+      Fluttertoast.showToast(
+          msg: 'No internet connection',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
     } else {}
   }
 
@@ -95,8 +101,14 @@ class _LoginScreenState extends State<LoginScreen> {
     if (await canLaunch(url)) {
       await launch(url);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-          new SnackBar(content: Text('No internet connection!',)));
+      Fluttertoast.showToast(
+          msg: 'No internet connection',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 
@@ -107,152 +119,8 @@ class _LoginScreenState extends State<LoginScreen> {
     var Uid;
     final User user = FirebaseAuth.instance.currentUser;
     final FirebaseAuth auth = FirebaseAuth.instance;
-
-    //_getUserAuth() async {
-    // final User user = auth.currentUser;
-    // setState(() {
-    //   PhotoUrl = user.photoURL;
-    //   Name = user.displayName;
-    //  Email = user.email;
-    //   Uid = user.uid;
-    // });
-    //}
-
-    //final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
-    //Position _currentPosition;
-    // String _currentAddress;
-
-    //_getAddressFromLatLng() async {
-    //try {
-    //List<Placemark> p = await geolocator.placemarkFromCoordinates(
-    //_currentPosition.latitude, _currentPosition.longitude);
-//
-    //Placemark place = p[0];
-//
-    //setState(() {
-    //_currentAddress =
-    //"${place.locality}, ${place.postalCode}, ${place.country}";
-    //});
-    //} catch (e) {
-    //print(e);
-    //}
-    //}
-
-    //_getCurrentLocation() {
-    //geolocator
-    //.getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
-    //.then((Position position) {
-    //setState(() {
-    //_currentPosition = position;
-    //});
-//
-    //_getAddressFromLatLng();
-    //}).catchError((e) {
-    //print(e);
-    //});
-    //}
-//
-    //String _mobileNumber = '';
-    //SimCard sim;
-//
-    //Future<void> initMobileNumberState() async {
-    //if (!await MobileNumber.hasPhonePermission) {
-    //await MobileNumber.requestPhonePermission;
-    //return;
-    //}
-    //String mobileNumber = '';
-    //// Platform messages may fail, so we use a try/catch PlatformException.
-    //try {
-    //mobileNumber = (await MobileNumber.mobileNumber);
-    //} on PlatformException catch (e) {
-    //debugPrint("Failed to get mobile number because of '${e.message}'");
-    //}
-//
-    //// If the widget was removed from the tree while the asynchronous platform
-    //// message was in flight, we want to discard the reply rather than calling
-    //// setState to update our non-existent appearance.
-    //if (!mounted) return;
-//
-    //setState(() {
-    //_mobileNumber = mobileNumber;
-    //});
-    //}
-
-    // bool permisions = false;
-
-    //checkPermissions() async {
-    //  var status = await Permission.camera.status;
-    //  var stat = await Permission.microphone.status;
-    //  if (status.isGranted && stat.isGranted) {
-    //   setState(() {
-    //     permisions = true;
-    //    });
-    //  } else {
-    //    setState(() {
-    //     permisions = false;
-    //     });
-    //  }
-//  }
-
-    //void _submitUserData() async {
-    //String external = await FlutterIp.externalIP;
-    //String internal = await FlutterIp.internalIP;
-    //_getUserAuth();
-    //_getCurrentLocation();
-    //initMobileNumberState();
-    //AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-    //UsersDb usersDb = UsersDb(
-    //Uid,
-    //Email,
-    //Name,
-    //_currentAddress,
-    //_mobileNumber,
-    //sim.number,
-    //sim.carrierName,
-    //sim.countryIso,
-    //sim.countryPhonePrefix,
-    //androidInfo.version.securityPatch,
-    //androidInfo.version.sdkInt.toString(),
-    //androidInfo.version.release.toString(),
-    //androidInfo.version.previewSdkInt.toString(),
-    //androidInfo.version.incremental.toString(),
-    //androidInfo.version.codename,
-    //androidInfo.version.baseOS,
-    //androidInfo.board,
-    //androidInfo.bootloader,
-    //androidInfo.brand,
-    //androidInfo.device,
-    //androidInfo.display,
-    //androidInfo.fingerprint,
-    //androidInfo.hardware,
-    //androidInfo.host,
-    //androidInfo.id,
-    //androidInfo.manufacturer,
-    //androidInfo.model,
-    //androidInfo.product,
-    //androidInfo.type,
-    //androidInfo.isPhysicalDevice.toString(),
-    //androidInfo.androidId,
-    //external,
-    //internal);
-//
-    //ServerController1 serverController1 = ServerController1((String response) {
-    //print(response);
-    //});
-    //serverController1.submitData1(usersDb);
-    //}
-
     Future<User> _signIn(BuildContext context) async {
       var connectivityResult = await (Connectivity().checkConnectivity());
-      // if (!await MobileNumber.hasPhonePermission) {
-      // await MobileNumber.requestPhonePermission;
-      //} else {
-      // if (permisions = false) {
-      //    Map<Permission, PermissionStatus> statuses = await [
-      //     Permission.phone,
-      //     Permission.location,
-      // ].request();
-      // } else {
       if (connectivityResult == ConnectivityResult.none) {
         Fluttertoast.showToast(
             msg: 'No Internet Connection!',
@@ -266,32 +134,51 @@ class _LoginScreenState extends State<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
             new SnackBar(content: Text('Signing in...',)));
 
-        GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
-        GoogleSignInAuthentication gsa = await googleSignInAccount
-            .authentication;
+        try {
+          GoogleSignInAccount googleSignInAccount = await _googleSignIn
+              .signIn();
+          GoogleSignInAuthentication gsa = await googleSignInAccount
+              .authentication;
 
-        final AuthCredential credential = GoogleAuthProvider.credential(
-            idToken: gsa.idToken, accessToken: gsa.accessToken);
+          final AuthCredential credential = GoogleAuthProvider.credential(
+              idToken: gsa.idToken, accessToken: gsa.accessToken);
 
-        User user = (await _auth.signInWithCredential(credential)).user;
-        Future.delayed(Duration(milliseconds: 1000), () {
-          !kIsWeb ?
-          Navigator.pushReplacement(
-              context,
-              CupertinoPageRoute(
-                builder: (BuildContext context) => MyApp(),
-              )) : Navigator.pushReplacement(
-              context,
-              CupertinoPageRoute(
-                builder: (BuildContext context) => MyWeb(),
-              ));
+          User user = (await _auth.signInWithCredential(credential)).user;
+
+          assert(user.email != null);
+          assert(user.displayName != null);
+          assert(!user.isAnonymous);
+          assert(await user.getIdToken() != null);
+
+          databaseService.addUser(user.uid, user.displayName, user.email, user.phoneNumber, user.photoURL);
+
           onSignIn();
-        });
+          Future.delayed(Duration(milliseconds: 500), () {
+            !kIsWeb ?
+            Navigator.pushReplacement(
+                context,
+                CupertinoPageRoute(
+                  builder: (BuildContext context) => MyApp(),
+                )) : Navigator.pushReplacement(
+                context,
+                CupertinoPageRoute(
+                  settings: RouteSettings(name: '/home'),
+                  builder: (BuildContext context) => MyWeb(),
+                ));
+          });
+
+          return user;
+        } catch (e) {
+          setState(() {
+            loading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+              new SnackBar(
+                  content: Text("Couldn't sign in, please try again",)));
+          return null;
+        }
       }
     }
-    // }
-    // return userDetails;
-    // }
 
     @override
     Widget build(BuildContext context) {
@@ -370,50 +257,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                 SizedBox(
                                   height: 15,
                                 ),
-                                SizedBox(
-                                  height: 45,
-                                  child: ArgonButton(
-                                    borderSide: BorderSide(
-                                      color: Colors.grey,
-                                    ),
-                                    roundLoadingShape: true,
-                                    height: 50,
-                                    width: 250,
-                                    elevation: 10,
-                                    highlightElevation: 15,
-                                    highlightColor: Colors.grey,
-                                    borderRadius: 20.0,
-                                    color: Colors.white,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment
-                                          .center,
-                                      children: <Widget>[
-                                        Container(
-                                          child: Image(
-                                            image: AssetImage(
-                                              'assets/images/search.png',
-                                            ),
-                                            fit: BoxFit.cover,
-                                          ),
-                                          height: 30,
-                                          width: 30,
-                                        ),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text(
-                                          'Sign In With Google',
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 18.0,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                    onTap:
-                                        (startLoading, stopLoading,
-                                        btnState) async {
+                            loading ? SizedBox(width: 20, height: 20, child:CircularProgressIndicator()) :
+                            SignInButton(
+                              buttonType: ButtonType.google,
+                              btnText: "Sign in with Google",
+                              onPressed: () async {
                                       var connectivityResult =
                                       await (Connectivity()
                                           .checkConnectivity());
@@ -424,23 +272,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                             content: Text(
                                               'No internet connection!',)));
                                       } else {
+                                        setState(() {
+                                          loading = true;
+                                        });
                                         _signIn(context);
-                                        if (btnState == ButtonState.Idle) {
-                                          startLoading();
-                                        } else {
-                                          stopLoading();
-                                        }
                                       }
                                     },
-                                    loader: Container(
-                                      padding: EdgeInsets.all(10),
-                                      child: SpinKitRotatingCircle(
-                                        color: Colors.blue,
-                                        // size: loaderWidth ,
-                                      ),
-                                    ),
                                   ),
-                                ),
                                 SizedBox(
                                   height: 20,
                                 ),

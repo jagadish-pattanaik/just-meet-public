@@ -5,6 +5,8 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="HandheldFriendly" content="true" />
+  <meta name="robots" content="index, follow" />
   <meta name="description" content="Just Meet Video Conferencing">
   <title>Just Meet</title>
 
@@ -25,15 +27,21 @@
   <link rel="icon" type="image/png" href="favicon.png"/>
 
   <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
   <!-- The core Firebase JS SDK is always required and must be listed first -->
   <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
 
+  <div class="unSelectable">
+  <img src="icons/ssicon.png" alt="Just Meet logo" width="150" height="150" draggable="false" (dragstart)="false;" class="center"/>
+  </div>
+
   <!-- TODO: Add SDKs for Firebase products that you want to use
        https://firebase.google.com/docs/web/setup#available-libraries -->
   <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-analytics.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebase/8.6.2/firebase.js"></script>
 
   <script>

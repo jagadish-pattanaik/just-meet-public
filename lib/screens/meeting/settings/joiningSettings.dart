@@ -12,13 +12,11 @@ class joinSettings extends StatefulWidget {
 }
 
 class _joinSettingsState extends State<joinSettings> {
-  var useAvatar = true;
   var lowMode = true;
 
   getSettings() async {
     await SharedPreferences.getInstance().then((prefs) {
       setState(() {
-        useAvatar = prefs.getBool('useAvatar') ?? true;
         lowMode = prefs.getBool('lowMode') ?? true;
       });
     });
@@ -34,9 +32,9 @@ class _joinSettingsState extends State<joinSettings> {
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
-    return MaterialApp(
-      theme: themeNotifier.getTheme(),
-      home: Scaffold(
+    return Theme(
+      data: themeNotifier.getTheme(),
+      child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
             icon: Icon(
@@ -80,27 +78,6 @@ class _joinSettingsState extends State<joinSettings> {
                     ),
                     CupertinoSwitchListTile(
                       title: Text(
-                        "Use Profile Picture",
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                      subtitle:
-                      Text('Use profile picture as avatar in meeting'),
-                      dense: true,
-                      value: useAvatar,
-                      onChanged: onAvatarChanged,
-                    ),
-                    Divider(
-                      height: 1,
-                      color: themeNotifier.getTheme() == darkTheme
-                          ? Color(0xFF303030)
-                          : Colors.black12,
-                      indent: 15,
-                      endIndent: 0,
-                    ),
-                    CupertinoSwitchListTile(
-                      title: Text(
                         "Low Bandwidth Mode",
                         style: TextStyle(
                           fontSize: 16,
@@ -138,12 +115,4 @@ class _joinSettingsState extends State<joinSettings> {
     });
   }
 
-  onAvatarChanged(bool value) {
-    setState(() {
-      useAvatar = value;
-    });
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.setBool('useAvatar', value);
-    });
-  }
 }

@@ -72,11 +72,9 @@ class _PriPolicyState extends State<PriPolicy> {
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
     TextStyle linkStyle = TextStyle(color: Colors.blue, fontSize: 16,);
-    return MaterialApp(
-      title: 'Just Meet',
-      debugShowCheckedModeBanner: false,
-      theme: themeNotifier.getTheme(),
-      home: Scaffold(
+    return Theme(
+      data: themeNotifier.getTheme(),
+      child: Scaffold(
         appBar: AppBar(
           iconTheme: IconThemeData(color: themeNotifier.getTheme() == darkTheme
               ? Colors.white : Colors.black54),

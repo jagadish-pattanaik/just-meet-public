@@ -2,6 +2,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:jagu_meet/firebase/ads/admobAds.dart';
 import 'package:jagu_meet/theme/theme.dart';
 import 'package:jagu_meet/theme/themeNotifier.dart';
 import 'package:jitsi_meet/jitsi_meet.dart';
@@ -53,6 +54,8 @@ class LiveDetails extends StatefulWidget {
 }
 
 class _LiveDetailsState extends State<LiveDetails> {
+  AdHelper adHelper = new AdHelper();
+
   final serverText = TextEditingController();
 
   var isAudioOnly;
@@ -114,6 +117,7 @@ class _LiveDetailsState extends State<LiveDetails> {
   @override
   void initState() {
     getSettings();
+    adHelper.interstitialAdload();
     getDevice();
     getAppInfo();
     super.initState();
@@ -211,9 +215,7 @@ class _LiveDetailsState extends State<LiveDetails> {
                       height: 50.0,
                       width: MediaQuery.of(context).size.width * 0.90,
                       child: RaisedButton(
-                          color: themeNotifier.getTheme() == darkTheme
-                              ? Color(0xff0184dc)
-                              : Colors.blue,
+                          color: Color(0xff0184dc),
                           disabledColor: themeNotifier.getTheme() == darkTheme
                               ? Color(0xFF242424)
                               : Colors.grey,
@@ -398,6 +400,7 @@ class _LiveDetailsState extends State<LiveDetails> {
                 textColor: Colors.white,
                 fontSize: 16.0);
             Navigator.of(context).pop();
+            adHelper.showInterstitialAd();
             meetFeedback();
             debugPrint("${options.room} terminated with message: $message");
           }, onPictureInPictureWillEnter: (message) {
@@ -465,9 +468,7 @@ class _LiveDetailsState extends State<LiveDetails> {
             child: Text(
               'Submit',
               style: TextStyle(
-                color: themeNotifier.getTheme() == darkTheme
-                    ? Color(0xff0184dc)
-                    : Colors.blue,
+                color: Color(0xff0184dc)
               ),
             ),
             onPressed: () {
@@ -483,10 +484,6 @@ class _LiveDetailsState extends State<LiveDetails> {
                           'User Details: '
                           '\n'
                           'Running on device: $deviceData.  '
-                          '\n'
-                          'user id: ${widget.uid} .  '
-                          '\n'
-                          'email: ${widget.email} .  '
                           '\n'
                           '\n'
                           'app version: $version .  '

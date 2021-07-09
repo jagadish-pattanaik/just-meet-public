@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BottomBar extends StatefulWidget {
@@ -23,7 +24,7 @@ class _BottomBarState extends State<BottomBar> {
               BottomBarColumn(
                 heading: 'ABOUT',
                 s1: 'Contact Us',
-                s2: 'About Us',
+                s2: 'About',
                 s3: 'Developer',
                 sf1: '1',
                 sf2: '1',
@@ -107,7 +108,14 @@ class _BottomBarColumnState extends State<BottomBarColumn> {
     if (await canLaunch(url)) {
       await launch(url);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text('No internet connection!',)));
+      Fluttertoast.showToast(
+          msg: 'No internet connection',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 
@@ -115,7 +123,14 @@ class _BottomBarColumnState extends State<BottomBarColumn> {
     if (await canLaunch(url)) {
       await launch(url);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text('No internet connection!',)));
+      Fluttertoast.showToast(
+          msg: 'No internet connection',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 

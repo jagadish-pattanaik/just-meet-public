@@ -16,11 +16,9 @@ class _InformationState extends State<Information> {
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
-    return MaterialApp(
-      title: 'Just Meet',
-      debugShowCheckedModeBanner: false,
-      theme: themeNotifier.getTheme(),
-      home: Scaffold(
+    return Theme(
+      data: themeNotifier.getTheme(),
+      child: Scaffold(
       appBar: AppBar(
       title: Text(
       widget.title,
@@ -58,7 +56,7 @@ class _InformationState extends State<Information> {
       Padding(padding: EdgeInsets.symmetric(horizontal: 10),
     child: Text(widget.text,
       style: TextStyle(
-      fontSize: 18,
+      fontSize: 15,
       color: themeNotifier.getTheme() == darkTheme
           ? Colors.white
           : Colors.black,

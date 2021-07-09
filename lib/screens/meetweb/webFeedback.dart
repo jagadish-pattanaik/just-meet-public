@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:jagu_meet/theme/theme.dart';
 import 'package:jagu_meet/theme/themeNotifier.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,14 @@ class _WebFeedbackState extends State<WebFeedback> {
     if (await canLaunch(url)) {
       await launch(url);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text('No internet connection!',)));
+      Fluttertoast.showToast(
+          msg: 'No internet connection',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 
@@ -44,11 +52,9 @@ class _WebFeedbackState extends State<WebFeedback> {
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
     final bool showFab = MediaQuery.of(context).viewInsets.bottom == 0.0;
-    return MaterialApp(
-      title: 'Just Meet',
-      debugShowCheckedModeBanner: false,
-      theme: themeNotifier.getTheme(),
-      home: Scaffold(
+    return Theme(
+      data: themeNotifier.getTheme(),
+      child: Scaffold(
         appBar: AppBar(
           iconTheme: IconThemeData(color: themeNotifier.getTheme() == darkTheme
               ? Colors.white : Colors.black54),
@@ -77,9 +83,7 @@ class _WebFeedbackState extends State<WebFeedback> {
                   fontWeight: FontWeight.bold)),
           icon: Icon(Icons.mail_outline,
               color: Colors.white),
-          backgroundColor: themeNotifier.getTheme() == darkTheme
-              ? Color(0xff0184dc)
-              : Colors.blue,
+          backgroundColor: Color(0xff0184dc)
         ) : Container(),
         body: SafeArea(
           child: ResponsiveBuilder(
@@ -155,7 +159,14 @@ class _WebFeedbackState extends State<WebFeedback> {
                       onPressed: isButtonEnabled
                           ? () async {
                         // _submitFeedbackData(widget.email, widget.name, reportText.text);
-                        ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: Text('Thank you for your feedback',)));
+                        Fluttertoast.showToast(
+                            msg: 'Thank you for your feedback',
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.SNACKBAR,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
                         reportText.clear();
                       }
                           : null,
@@ -164,9 +175,7 @@ class _WebFeedbackState extends State<WebFeedback> {
                         style: TextStyle(
                             fontSize: 17, fontWeight: FontWeight.bold),
                       ),
-                      color: themeNotifier.getTheme() == darkTheme
-                          ? Color(0xff0184dc)
-                          : Colors.blue,
+                      color: Color(0xff0184dc),
                     ),
                   ),
                   SizedBox(

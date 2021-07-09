@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:in_app_review/in_app_review.dart';
 import 'package:jagu_meet/screens/others/webview.dart';
 import 'package:jagu_meet/theme/theme.dart';
 import 'package:jagu_meet/theme/themeNotifier.dart';
@@ -17,28 +16,12 @@ class Notify extends StatefulWidget {
 }
 
 class _NotifyState extends State<Notify> {
-  bool visible = true;
-
-  final InAppReview inAppReview = InAppReview.instance;
-
   var version;
   getAppInfo() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     setState(() {
       version = packageInfo.version;
     });
-  }
-
-  reviewAvailabled() async {
-    if (await inAppReview.isAvailable()) {
-      setState(() {
-        visible = true;
-      });
-    } else {
-      setState(() {
-        visible = false;
-      });
-    }
   }
 
   launchurl(String Url) async {
@@ -60,17 +43,9 @@ class _NotifyState extends State<Notify> {
                 )));
   }
 
-  requestReview() async {
-    if (await inAppReview.isAvailable()) {
-      inAppReview.requestReview();
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    reviewAvailabled();
-    requestReview();
     getAppInfo();
   }
 
@@ -78,11 +53,9 @@ class _NotifyState extends State<Notify> {
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context, listen: false);
     return OverlaySupport(
-      child: MaterialApp(
-        title: 'Just Meet',
-        debugShowCheckedModeBanner: false,
-        theme: themeNotifier.getTheme(),
-        home: Scaffold(
+      child: Theme(
+        data: themeNotifier.getTheme(),
+    child: Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
             leading: IconButton(
@@ -158,14 +131,14 @@ class _NotifyState extends State<Notify> {
                             child: ListTile(
                               onTap: () {
                                 launchurl(
-                                    'https://join.slack.com/t/jaguweb/shared_invite/zt-jv4hn24h-ZrJQZ3PmjH8wbM1Qy59DEw');
+                                    'https://discord.gg/yKQc25ERMw');
                               },
                               leading: SizedBox.fromSize(
                                   size: const Size(40, 40),
                                   child: ClipOval(child: Icon(Icons.comment))),
-                              title: Text('Join Our Slack Community'),
+                              title: Text('Join Our Discord Server'),
                               subtitle: Text(
-                                  'There is a slack community which can help you with Just Meet!', overflow: TextOverflow.ellipsis,),
+                                  'There is a Discord Server which can help you with Just Meet!', overflow: TextOverflow.ellipsis,),
                               trailing: Icon(Icons.arrow_forward_ios),
                             ),
                           ),
@@ -173,32 +146,6 @@ class _NotifyState extends State<Notify> {
                         SizedBox(
                           height: 10,
                         ),
-                        visible ?
-                        Card(
-                          color: themeNotifier.getTheme() == darkTheme
-                              ? Color(0xFF242424)
-                              : Colors.white,
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          child: SafeArea(
-                            child: ListTile(
-                              onTap: () {
-                                launchurl(
-                                    'https://play.google.com/store/apps/details?id=com.jaguweb.jagu_meet');
-                              },
-                              leading: SizedBox.fromSize(
-                                  size: const Size(40, 40),
-                                  child: ClipOval(
-                                      child: Icon(Icons.thumb_up_alt_sharp))),
-                              title: Text('Rate Us'),
-                              subtitle: Text(
-                                  'Rate Just Meet in play store and give a review!', overflow: TextOverflow.ellipsis,),
-                              trailing: Icon(Icons.arrow_forward_ios),
-                            ),
-                          ),
-                        ) : Container(),
-                        visible ? SizedBox(
-                          height: 10,
-                        ) : Container(),
                         Card(
                           color: themeNotifier.getTheme() == darkTheme
                               ? Color(0xFF242424)
@@ -217,7 +164,7 @@ class _NotifyState extends State<Notify> {
                                       child: Icon(Icons.code))),
                               title: Text('Know about the Developer'),
                               subtitle: Text(
-                                  'Know about the person who developed Just Meet for you with love!', overflow: TextOverflow.ellipsis,),
+                                  'Know about the teen who developed Just Meet for you!', overflow: TextOverflow.ellipsis,),
                               trailing: Icon(Icons.arrow_forward_ios),
                             ),
                           ),
