@@ -61,7 +61,7 @@ The security section here was starting to feel a bit too succinct for the comple
   
 ## Donate
   <a href="https://www.buymeacoffee.com/jagadish">
-    <img width="30px" src="https://www.vectorlogo.zone/logos/buymeacoffee/buymeacoffee-official.svg" />
+    <img width="60px" src="https://www.vectorlogo.zone/logos/buymeacoffee/buymeacoffee-icon.svg" />
   </a>&ensp;
   
 ## Acknowledgements
