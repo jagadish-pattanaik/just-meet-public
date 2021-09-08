@@ -59,6 +59,11 @@ The security section here was starting to feel a bit too succinct for the comple
     <img width="30px" src="https://www.vectorlogo.zone/logos/facebook/facebook-tile.svg" />
   </a>&ensp;
   
+## Donate
+  <a href="https://www.buymeacoffee.com/jagadish">
+    <img width="30px" src="https://www.vectorlogo.zone/logos/buymeacoffee/buymeacoffee-official.svg" />
+  </a>&ensp;
+  
 ## Acknowledgements
 Copyright 2021 Jagadish Prasad Pattanaik. All rights reserved.
 
