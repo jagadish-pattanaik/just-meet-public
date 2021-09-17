@@ -36,7 +36,7 @@ Check out our [Wiki](https://github.com/jagadish-pattanaik/just-meet-public/wiki
 If you are looking to contribute to Just Meet, first of all, thank you! Please
 see our [guidelines for contributing](./CONTRIBUTING.md).
 
-##Security
+## Security
 For information on reporting security vulnerabilities in Just Meet, see [SECURITY.md](./SECURITY.md).
   
 ## Connect with me
