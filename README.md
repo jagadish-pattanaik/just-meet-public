@@ -17,6 +17,18 @@ Download from here: https://jmeet-8e163.web.app/
   
 ### Website
 https://jmeet-8e163.web.app/
+
+### Development
+Clone the repo with git -
+```bash
+git clone <REPO_LINK> jagu_meet -b main
+```
+Update the firebase values and `android` and `web` folder.<br>
+Install the [Flutter SDK](https://flutter.dev/) and open terminal in `jagu_meet` directory and type these commands -
+```bash
+flutter pub get
+flutter run
+```
   
 ## Release notes
 
