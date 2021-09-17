@@ -1,6 +1,17 @@
-# Just Meet - Unlimited, Featured & Secured Video Coneferncing
+# <p align="center"> Just Meet - Unlimited, Featured & Secured </p>
 
 Just Meet is a free & open-source video conferencing service developed by Jagadish Prasad Pattanaik mainly for business, office and education use. It has unlimited number of participants and no time restriction, new helpful features, is secured, private & completely free. Developed in India.
+
+<hr />
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/jitsi/jitsi-meet/master/readme-img1.png" width="900" />
+</p>
+
+<hr />
+
+## Features
+Check out our [Wiki](https://github.com/jagadish-pattanaik/just-meet-public/wiki#features)
 
 ## Download
 
@@ -13,23 +24,20 @@ Just Meet is a free & open-source video conferencing service developed by Jagadi
   </a>&ensp;
   
 ### Web app
-Download from here: https://jmeet-8e163.web.app/
+Download from our [Website](https://jmeet-8e163.web.app/) 
   
 ### Website
 https://jmeet-8e163.web.app/
   
 ## Release notes
-
-https://justmeetpolicies.blogspot.com/2021/07/release-notes-800.html
+Check out our [Wiki](https://github.com/jagadish-pattanaik/just-meet-public/wiki/Release-notes)
 
 ## Contributing
-
 If you are looking to contribute to Just Meet, first of all, thank you! Please
-see our [guidelines for contributing](CONTRIBUTING.md).
+see our [guidelines for contributing](./CONTRIBUTING.md).
 
-## Security & Prrivacy
-
-The security section here was starting to feel a bit too succinct for the complexity of the topic, so we created a post that covers the topic much more broadly here: https://justmeetpolicies.blogspot.com/2021/07/privacy-policy.html
+##Security
+For information on reporting security vulnerabilities in Just Meet, see [SECURITY.md](./SECURITY.md).
   
 ## Connect with me
   <a href="https://www.linkedin.com/in/jagadish-pattanaik/">
@@ -41,7 +49,7 @@ The security section here was starting to feel a bit too succinct for the comple
   <a href="https://stackoverflow.com/story/Jagadish">
     <img width="30px" src="https://www.vectorlogo.zone/logos/stackoverflow/stackoverflow-tile.svg" />
   </a>&ensp;
-  <a href="https://mail.google.com/mail/u/jaguweb1234@gmail.com">
+  <a href="jaguweb1234@gmail.com">
     <img width="30px" src="https://www.vectorlogo.zone/logos/gmail/gmail-tile.svg" />
   </a>
 
@@ -64,8 +72,25 @@ The security section here was starting to feel a bit too succinct for the comple
     <img width="60px" src="https://www.vectorlogo.zone/logos/buymeacoffee/buymeacoffee-icon.svg" />
   </a>&ensp;
   
-## Acknowledgements
+## Privacy policy
+
+The privacy policy section here was starting to feel a bit too succinct for the complexity of the topic, so we created a post that covers the topic much more broadly on our [Privacy policy Wiki page](https://github.com/jagadish-pattanaik/just-meet-public/wiki/Privacy-policy)
+
+## Terms & Conditions
+
+The privacy policy section here was starting to feel a bit too succinct for the complexity of the topic, so we created a post that covers the topic much more broadly on our [Terms & Conditions Wiki page](https://github.com/jagadish-pattanaik/just-meet-public/wiki/Terms-&-Conditions)
+  
+<br>
+</br>
+<br>
+</br>
+
+<footer>
+<p align="center" style="font-size: smaller;">
 Copyright 2021 Jagadish Prasad Pattanaik. All rights reserved.
+</p>
+</footer>
+
 
 
 
