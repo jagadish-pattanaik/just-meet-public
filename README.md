@@ -71,6 +71,9 @@ For information on reporting security vulnerabilities in Just Meet, see [SECURIT
   <a href="https://www.buymeacoffee.com/jagadish">
     <img width="60px" src="https://www.vectorlogo.zone/logos/buymeacoffee/buymeacoffee-icon.svg" />
   </a>&ensp;
+  <a href="https://www.patreon.com/justjagadish">
+    <img width="30px" src="https://www.vectorlogo.zone/logos/patreon/patreon-icon.svg" />
+  </a>&ensp;
   
 ## Privacy policy
 
