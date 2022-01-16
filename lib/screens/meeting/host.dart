@@ -299,7 +299,7 @@ class _HostPageState extends State<HostPage> with SingleTickerProviderStateMixin
         packageName: 'com.jaguweb.jagu_meet',
         minimumVersion: int.parse(packageInfo.buildNumber),
       ),
-      iosParameters: IosParameters(
+      iosParameters: IOSParameters(
           fallbackUrl: Uri.parse('https://jmeet-8e163.web.app/'),
           ipadFallbackUrl: Uri.parse('https://jmeet-8e163.web.app/'),
           bundleId: ''),
@@ -315,10 +315,10 @@ class _HostPageState extends State<HostPage> with SingleTickerProviderStateMixin
             'Just Meet is the leader in video conferences, with easy, secured, encrypted and reliable video and audio conferencing, chat, screen sharing and webinar across mobile and desktop. Unlimited participants and time with low bandwidth mode. Join Just Meet Video Conference now and enjoy high quality video conferences with security like no other. Stay Safe and Stay Connected with Just Meet. Developed in India with love.',
       ),
     );
-    final Uri longLink = await parameters.buildUrl();
-    final ShortDynamicLink shortDynamicLink = await DynamicLinkParameters.shortenUrl(Uri.parse(longLink.toString() + "&ofl=https://jmeet-8e163.web.app/"));
-    final Uri dynamicUrl = shortDynamicLink.shortUrl;
-    return dynamicUrl;
+    final Uri longLink = await FirebaseDynamicLinks.instance.buildLink(parameters);
+    ///TODO final ShortDynamicLink shortDynamicLink = await DynamicLinkParameters.shortenUrl(Uri.parse(longLink.toString() + "&ofl=https://jmeet-8e163.web.app/"));
+    ///TODO final Uri dynamicUrl = shortDynamicLink.shortUrl;
+    ///TODOreturn dynamicUrl;
   }
 
   @override

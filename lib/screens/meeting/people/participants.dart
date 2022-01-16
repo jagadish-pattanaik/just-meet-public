@@ -53,7 +53,7 @@ class _ParticipantsState extends State<Participants> {
         packageName: 'com.jaguweb.jagu_meet',
         minimumVersion: int.parse(packageInfo.buildNumber),
       ),
-      iosParameters: IosParameters(
+      iosParameters: IOSParameters(
           fallbackUrl: Uri.parse('https://jmeet-8e163.web.app/'),
           ipadFallbackUrl: Uri.parse('https://jmeet-8e163.web.app/'),
           bundleId: ''),
@@ -68,7 +68,7 @@ class _ParticipantsState extends State<Participants> {
         description: urlLinkDescription,
       ),
     );
-    final ShortDynamicLink shortDynamicLink = await parameters.buildShortLink();
+    final ShortDynamicLink shortDynamicLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
     final Uri dynamicUrl = shortDynamicLink.shortUrl;
     return dynamicUrl;
   }

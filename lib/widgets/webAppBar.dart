@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:jagu_meet/screens/meetweb/webFeedback.dart';
-import 'package:jagu_meet/screens/meetweb/webHost.dart';
-import 'package:jagu_meet/screens/meetweb/webReport.dart';
-import 'package:jagu_meet/screens/meetweb/webSettings.dart';
+import 'package:jagu_meet/web/webFeedback.dart';
+import 'package:jagu_meet/web/webHost.dart';
+import 'package:jagu_meet/web/webReport.dart';
+import 'package:jagu_meet/web/webSettings.dart';
 import 'package:jagu_meet/screens/user/profilePage.dart';
 import 'package:jagu_meet/theme/theme.dart';
 import 'package:jagu_meet/theme/themeNotifier.dart';

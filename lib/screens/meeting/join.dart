@@ -200,7 +200,7 @@ class _JoinState extends State<Join> {
         packageName: 'com.jaguweb.jagu_meet',
         minimumVersion: int.parse(packageInfo.buildNumber),
       ),
-      iosParameters: IosParameters(
+      iosParameters: IOSParameters(
           fallbackUrl: Uri.parse('https://jmeet-8e163.web.app/'),
           ipadFallbackUrl: Uri.parse('https://jmeet-8e163.web.app/'),
           bundleId: ''),
@@ -216,7 +216,7 @@ class _JoinState extends State<Join> {
         'Just Meet is the leader in video conferences, with easy, secured, encrypted and reliable video and audio conferencing, chat, screen sharing and webinar across mobile and desktop. Unlimited participants and time with low bandwidth mode. Join Just Meet Video Conference now and enjoy high quality video conferences with security like no other. Stay Safe and Stay Connected with Just Meet. Developed in India with love.',
       ),
     );
-    final ShortDynamicLink shortDynamicLink = await parameters.buildShortLink();
+    final ShortDynamicLink shortDynamicLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
     final Uri dynamicUrl = shortDynamicLink.shortUrl;
     return dynamicUrl;
   }

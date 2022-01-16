@@ -15,13 +15,13 @@ import 'package:jagu_meet/screens/meeting/details/recentJoined.dart';
 import 'package:jagu_meet/screens/meeting/host.dart';
 import 'package:jagu_meet/screens/meeting/join.dart';
 import 'package:jagu_meet/screens/meeting/people/invites.dart';
-import 'package:jagu_meet/screens/meetweb/meet.dart';
-import 'package:jagu_meet/screens/meetweb/meetWeb.dart';
-import 'package:jagu_meet/screens/meetweb/webFeedback.dart';
-import 'package:jagu_meet/screens/meetweb/webHost.dart';
-import 'package:jagu_meet/screens/meetweb/webJoin.dart';
-import 'package:jagu_meet/screens/meetweb/webReport.dart';
-import 'package:jagu_meet/screens/meetweb/webSettings.dart';
+import 'package:jagu_meet/web/meet.dart';
+import 'package:jagu_meet/web/meetWeb.dart';
+import 'package:jagu_meet/web/webFeedback.dart';
+import 'package:jagu_meet/web/webHost.dart';
+import 'package:jagu_meet/web/webJoin.dart';
+import 'package:jagu_meet/web/webReport.dart';
+import 'package:jagu_meet/web/webSettings.dart';
 import 'package:jagu_meet/screens/meeting/search/searchMeetings.dart';
 import 'package:jagu_meet/screens/meeting/startLive.dart';
 import 'package:jagu_meet/screens/others/aboutus.dart';
@@ -292,11 +292,9 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
         await FirebaseDynamicLinks.instance.getInitialLink();
     _handleDeepLink(data);
 
-    FirebaseDynamicLinks.instance.onLink(
-        onSuccess: (PendingDynamicLinkData dynamicLink) async {
-      // 3a. handle link that has been retrieved
+    FirebaseDynamicLinks.instance.onLink.listen((PendingDynamicLinkData dynamicLink) async {
       _handleDeepLink(dynamicLink);
-    }, onError: (OnLinkErrorException e) async {
+    }).onError((error) async {
       Fluttertoast.showToast(
           msg: 'Failed Joining Meeting',
           toastLength: Toast.LENGTH_SHORT,
@@ -2466,7 +2464,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
         packageName: 'com.jaguweb.jagu_meet',
         minimumVersion: int.parse(packageInfo.buildNumber),
       ),
-      iosParameters: IosParameters(
+      iosParameters: IOSParameters(
           fallbackUrl: Uri.parse('https://jmeet-8e163.web.app/'),
           ipadFallbackUrl: Uri.parse('https://jmeet-8e163.web.app/'),
           bundleId: ''),
@@ -2475,16 +2473,19 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
         medium: 'Social',
         source: 'Just Meet',
       ),
+      //navigationInfoParameters: NavigationInfoParameters(
+       // forcedRedirectEnabled: true,
+      //),
       socialMetaTagParameters: SocialMetaTagParameters(
         imageUrl: linkImageUrl,
         title: urlLinkTitle,
         description: urlLinkDescription,
       ),
     );
-    final Uri longLink = await parameters.buildUrl();
-    final ShortDynamicLink shortDynamicLink = await DynamicLinkParameters.shortenUrl(Uri.parse(longLink.toString() + "&ofl=https://jmeet-8e163.web.app/"));
-    final Uri dynamicUrl = shortDynamicLink.shortUrl;
-    return dynamicUrl;
+    final Uri longLink = await FirebaseDynamicLinks.instance.buildLink(parameters);
+    ///TODO final ShortDynamicLink shortDynamicLink = await DynamicLinkParameters.shortenUrl(Uri.parse(longLink.toString() + "&ofl=https://jmeet-8e163.web.app/"));
+    ///TODO final Uri dynamicUrl = shortDynamicLink.shortUrl;
+    ///TODO return dynamicUrl;
   }
 
   onChatChanged(bool value) {

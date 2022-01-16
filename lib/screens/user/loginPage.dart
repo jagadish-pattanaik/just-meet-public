@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_offline/flutter_offline.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:jagu_meet/main.dart';
-import 'package:jagu_meet/screens/meetweb/meetWeb.dart';
+import 'package:jagu_meet/web/meetWeb.dart';
 import 'package:jagu_meet/screens/others/webview.dart';
 import 'package:jagu_meet/theme/theme.dart';
 import 'package:jagu_meet/theme/themeNotifier.dart';

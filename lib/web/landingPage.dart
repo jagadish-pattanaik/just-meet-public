@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jagu_meet/theme/theme.dart';
 import 'package:jagu_meet/theme/themeNotifier.dart';
 import 'package:jagu_meet/utils/responsiveLayout.dart';
-import 'package:jagu_meet/screens/meetweb/landingNavBar.dart';
+import 'package:jagu_meet/web/landingNavBar.dart';
 import 'package:provider/provider.dart';
 
 class LandingPage extends StatelessWidget {
