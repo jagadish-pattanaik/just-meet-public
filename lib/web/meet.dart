@@ -130,11 +130,18 @@ class _MeetState extends State<Meet> {
       ..userAvatarURL = widget.url
       ..featureFlags.addAll(featureFlags)
       ..webOptions = {
+        "interfaceConfigOverwrite": { "SHOW_CHROME_EXTENSION_BANNER": false },
         "roomName": widget.id,
         "width": "100%",
         "height": "100%",
         "enableWelcomePage": false,
         "chromeExtensionBanner": null,
+        "configOverwrite":
+        {
+          "chromeExtensionBanner": null,
+          "disableInviteFunctions": true,
+          "prejoinPageEnabled": false,
+        },
         "userInfo": {"displayName": '${widget.name}'}
       };
 
@@ -213,11 +220,18 @@ class _MeetState extends State<Meet> {
         ..userAvatarURL = widget.url
         ..featureFlags.addAll(featureFlags)
         ..webOptions = {
+          "interfaceConfigOverwrite": { "SHOW_CHROME_EXTENSION_BANNER": false },
           "roomName": widget.id,
           "width": "100%",
           "height": "100%",
           "enableWelcomePage": false,
           "chromeExtensionBanner": null,
+          "configOverwrite":
+          {
+            "chromeExtensionBanner": null,
+            "disableInviteFunctions": true,
+            "prejoinPageEnabled": false,
+          },
           "userInfo": {"displayName": '${widget.name}'}
         };
 
@@ -324,12 +338,19 @@ class _MeetState extends State<Meet> {
         ..userAvatarURL = widget.url
         ..featureFlags.addAll(featureFlags)
         ..webOptions = {
-          "roomName": JitsiMeetingOptions(room: id),
+          "interfaceConfigOverwrite": { "SHOW_CHROME_EXTENSION_BANNER": false },
+          "roomName": widget.id,
           "width": "100%",
           "height": "100%",
           "enableWelcomePage": false,
           "chromeExtensionBanner": null,
-          "userInfo": {"displayName": widget.name}
+          "configOverwrite":
+          {
+            "chromeExtensionBanner": null,
+            "disableInviteFunctions": true,
+            "prejoinPageEnabled": false,
+          },
+          "userInfo": {"displayName": '${widget.name}'}
         };
 
       debugPrint("JitsiMeetingOptions: $options");

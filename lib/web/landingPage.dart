@@ -74,7 +74,7 @@ class LargeChild extends StatelessWidget {
                           fontWeight: FontWeight.bold)),
                   Padding(
                     padding: const EdgeInsets.only(left: 12.0, top: 20),
-                    child: Text("UNLIMITED, SECURED AND FREE!"),
+                    child: Text("Featured, Unlimited & Secured!"),
                   ),
                   SizedBox(
                     height: 40,

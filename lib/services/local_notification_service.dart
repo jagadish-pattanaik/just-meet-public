@@ -34,82 +34,80 @@ class LocalNotificationServices {
 
     _notificationsPlugin.initialize(
         initializationSettings,onSelectNotification: (String route) async{
-      if(route != null){
-        if (route == 'schedule') {
-          Navigator.push(
-              context,
-              CupertinoPageRoute(
-                builder: (context) => NoteScreen(
-                  _userUid,
-                  _userEmail,
-                  randomNumeric(11),
-                  '',
-                  new DateFormat('yyyy-MM-dd').format(DateTime.now()).toString(),
-                  '',
-                  '',
-                  'Never',
-                  true,
-                  false,
-                  false,
-                  true,
-                  true,
-                  false,
-                ),
-              ));
-        } else if (route == 'host') {
-          Navigator.push(
-              context,
-              CupertinoPageRoute(
-                  builder: (context) =>
-                      HostPage(
-                        name: _userName,
-                        email: _userEmail,
-                        uid: _userUid,
-                        url: _userUrl,
-                      )));
-        }  else if (route == 'join') {
-          Navigator.push(
-              context,
-              CupertinoPageRoute(
-                  builder: (context) => Join(
-                    name: _userName,
-                    email: _userEmail,
-                    uid: _userUid,
-                    url: _userUrl,
-                  )));
-        }  else if (route == 'live') {
-          Navigator.push(
-              context,
-              CupertinoPageRoute(
-                  builder: (context) => StartLive(
-                    email: _userEmail,
-                    name: _userName,
-                    url: _userUrl,)));
-        } else if (route == 'live') {
-          Navigator.push(
-              context,
-              CupertinoPageRoute(
-                  builder: (context) => StartLive(
-                    email: _userEmail,
-                    name: _userName,
-                    url: _userUrl,)));
-        } else if (route.contains('reminder')) {
-          Navigator.push(
+      if (route == 'schedule') {
+        Navigator.push(
             context,
             CupertinoPageRoute(
-                builder: (context) => viewScheduled(
-                  id: route.split('reminder_'),
+              builder: (context) => NoteScreen(
+                _userUid,
+                _userEmail,
+                randomNumeric(11),
+                '',
+                new DateFormat('yyyy-MM-dd').format(DateTime.now()).toString(),
+                '',
+                '',
+                'Never',
+                true,
+                false,
+                false,
+                true,
+                true,
+                false,
+              ),
+            ));
+      } else if (route == 'host') {
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (context) =>
+                    HostPage(
+                      name: _userName,
+                      email: _userEmail,
+                      uid: _userUid,
+                      url: _userUrl,
+                    )));
+      }  else if (route == 'join') {
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (context) => Join(
                   name: _userName,
                   email: _userEmail,
-                  PhotoUrl: _userUrl,
                   uid: _userUid,
-                )),
-          );
-        } else {
+                  url: _userUrl,
+                )));
+      }  else if (route == 'live') {
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (context) => StartLive(
+                  email: _userEmail,
+                  name: _userName,
+                  url: _userUrl,)));
+      } else if (route == 'live') {
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (context) => StartLive(
+                  email: _userEmail,
+                  name: _userName,
+                  url: _userUrl,)));
+      } else if (route.contains('reminder')) {
+        Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (context) => viewScheduled(
+                id: route.split('reminder_'),
+                name: _userName,
+                email: _userEmail,
+                PhotoUrl: _userUrl,
+                uid: _userUid,
+              )),
+        );
+      } else {
 
-        }
       }
-    });
+        });
   }
 
   static void display(RemoteMessage message) async {

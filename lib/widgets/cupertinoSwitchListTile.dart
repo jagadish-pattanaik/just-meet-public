@@ -14,14 +14,11 @@ class CupertinoSwitchListTile extends StatelessWidget {
     this.activeColor,
     this.title,
     this.subtitle,
-    this.isThreeLine: false,
+    this.isThreeLine = false,
     this.dense,
     this.secondary,
-    this.selected: false,
-  })  : assert(value != null),
-        assert(isThreeLine != null),
-        assert(!isThreeLine || subtitle != null),
-        assert(selected != null),
+    this.selected = false,
+  })  : assert(!isThreeLine || subtitle != null),
         super(key: key);
 
   /// Whether this switch is checked.

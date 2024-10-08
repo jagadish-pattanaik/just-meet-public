@@ -6,7 +6,7 @@ import 'package:jagu_meet/firebase/ads/admobAds.dart';
 import 'package:jagu_meet/firebase/databases/usersCloudDb.dart';
 import 'package:jagu_meet/theme/theme.dart';
 import 'package:jagu_meet/theme/themeNotifier.dart';
-import 'package:jitsi_meet/jitsi_meet.dart';
+import 'package:jitsi_meet_wrapper/jitsi_meet_wrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:random_string/random_string.dart';
 
@@ -203,42 +203,37 @@ class _StartLiveState extends State<StartLive> {
     serverText.text?.trim()?.isEmpty ?? "" ? null : serverText.text;
 
     try {
-      Map<FeatureFlagEnum, bool> featureFlags = {
-        FeatureFlagEnum.WELCOME_PAGE_ENABLED: false,
-        ////featureFlag.resolution = FeatureFlagVideoResolution.HD_RESOLUTION;
-        FeatureFlagEnum.PIP_ENABLED: false,
+      Map<FeatureFlag, Object> featureFlags = {
+        FeatureFlag.isWelcomePageEnabled: false,
+       // featureFlag.resolution = FeatureFlagVideoResolution.HD_RESOLUTION;
+        FeatureFlag.isPipEnabled: false,
+        FeatureFlag.isAddPeopleEnabled: false,
+        FeatureFlag.isInviteEnabled: false,
+        FeatureFlag.isCalendarEnabled: false,
       };
 
       // Here is an example, disabling features for each platform
       if (Platform.isAndroid) {
-        // Disable ConnectionService usage on Android to avoid issues (see README)
-        featureFlags[FeatureFlagEnum.CALL_INTEGRATION_ENABLED] = false;
-        featureFlags[FeatureFlagEnum.INVITE_ENABLED] = false;
-        featureFlags[FeatureFlagEnum.TOOLBOX_ALWAYS_VISIBLE] = false;
+        featureFlags[FeatureFlag.isCallIntegrationEnabled] = false;
+        featureFlags[FeatureFlag.isInviteEnabled] = false;
+        featureFlags[FeatureFlag.isToolboxAlwaysVisible] = false;
       } else if (Platform.isIOS) {
         // Disable PIP on iOS as it looks weird
-        featureFlags[FeatureFlagEnum.PIP_ENABLED] = false;
       }
 
       // Define meetings options here
-      var options = JitsiMeetingOptions(room: id)
-        ..serverURL = serverUrl
-        ..subject = topic
-        ..userDisplayName = widget.name
-        ..userEmail = widget.email
-        ..audioOnly = false
-        ..audioMuted = true
-        ..videoMuted = true
-        ..userAvatarURL = widget.url
-        ..featureFlags.addAll(featureFlags)
-        ..webOptions = {
-          "roomName": JitsiMeetingOptions(room: id),
-          "width": "100%",
-          "height": "100%",
-          "enableWelcomePage": false,
-          "chromeExtensionBanner": null,
-          "userInfo": {"displayName": widget.name}
-        };
+      var options = JitsiMeetingOptions(
+          roomNameOrUrl: id,
+          serverUrl: serverUrl,
+          subject: topic,
+          userDisplayName: widget.name,
+          userEmail: widget.email,
+          isAudioOnly: false,
+          isAudioMuted: true,
+          isVideoMuted: true,
+          userAvatarUrl: widget.url,
+          featureFlags: featureFlags,
+        );
 
       debugPrint("JitsiMeetingOptions: $options");
       var connectivityResult = await (Connectivity().checkConnectivity());
@@ -252,8 +247,8 @@ class _StartLiveState extends State<StartLive> {
             textColor: Colors.white,
             fontSize: 16.0);
       } else {
-        await JitsiMeet.joinMeeting(
-          options,
+        await JitsiMeetWrapper.joinMeeting(
+          options: options,
           listener: JitsiMeetingListener(onConferenceWillJoin: (message) {
             Fluttertoast.showToast(
                 msg: 'Starting your meeting...',
@@ -263,7 +258,6 @@ class _StartLiveState extends State<StartLive> {
                 backgroundColor: Colors.black,
                 textColor: Colors.white,
                 fontSize: 16.0);
-            debugPrint("${options.room} will join with message: $message");
           }, onConferenceJoined: (message) async {
             databaseService.addLive(id, widget.email, widget.name, options.subject);
             Fluttertoast.showToast(
@@ -274,8 +268,7 @@ class _StartLiveState extends State<StartLive> {
                 backgroundColor: Colors.black,
                 textColor: Colors.white,
                 fontSize: 16.0);
-            debugPrint("${options.room} joined with message: $message");
-          }, onConferenceTerminated: (message) {
+          }, onConferenceTerminated: (url, error) {
             databaseService.removeLive(id);
             Fluttertoast.showToast(
                 msg: 'Meeting Ended By You',
@@ -286,28 +279,8 @@ class _StartLiveState extends State<StartLive> {
                 textColor: Colors.white,
                 fontSize: 16.0);
             adHelper.showInterstitialAd();
-            debugPrint("${options.room} terminated with message: $message");
-          }, onPictureInPictureWillEnter: (message) {
-            Fluttertoast.showToast(
-                msg: 'To return to meeting, open Just Meet',
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.SNACKBAR,
-                timeInSecForIosWeb: 1,
-                backgroundColor: Colors.black,
-                textColor: Colors.white,
-                fontSize: 16.0);
-            debugPrint(
-                "${options.room} entered PIP mode with message: $message");
-          }, onPictureInPictureTerminated: (message) {
-            debugPrint(
-                "${options.room} exited PIP mode with message: $message");
-          }, genericListeners: [
-            JitsiGenericListener(
-                eventName: 'readyToClose',
-                callback: (dynamic message) {
-                  debugPrint("readyToClose callback");
-                }),
-          ]),);
+          },
+          ),);
       }
     } catch (error) {
       Fluttertoast.showToast(

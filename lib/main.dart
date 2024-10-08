@@ -114,7 +114,7 @@ void main() async {
 
 Future<void> backgroundHandler(RemoteMessage message) async{
   print(message.data.toString());
-  print(message.notification.title);
+  print(message.notification?.title);
 }
 
 class MyApp extends StatefulWidget {
@@ -131,7 +131,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   String shortcut = "no action set";
 
   final InAppReview inAppReview = InAppReview.instance;
-  AppUpdateInfo _updateInfo;
+  late AppUpdateInfo _updateInfo;
 
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   var deviceData;
@@ -142,7 +142,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
     });
   }
 
-  DateTime currentBackPressTime;
+  late DateTime currentBackPressTime;
 
   FocusNode myFocusNode = FocusNode();
 
@@ -196,8 +196,8 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   var linkKick;
   var linkHost = '';
 
-  bool isButtonEnabled;
-  bool isEnabled;
+  late bool isButtonEnabled;
+  late bool isEnabled;
 
   final now = DateTime.now().toString();
   String version = '.';
@@ -288,9 +288,9 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   );
 
   Future handleDynamicLinks() async {
-    final PendingDynamicLinkData data =
+    final PendingDynamicLinkData? data =
         await FirebaseDynamicLinks.instance.getInitialLink();
-    _handleDeepLink(data);
+    _handleDeepLink(data!);
 
     FirebaseDynamicLinks.instance.onLink.listen((PendingDynamicLinkData dynamicLink) async {
       _handleDeepLink(dynamicLink);
@@ -307,186 +307,184 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   }
 
   void _handleDeepLink(PendingDynamicLinkData data) async {
-    final Uri deepLink = data?.link;
-    if (deepLink != null) {
-      print('_handleDeepLink | deeplink: $deepLink');
+    final Uri? deepLink = data.link;
+    print('_handleDeepLink | deeplink: $deepLink');
+    Fluttertoast.showToast(
+        msg: 'Connecting...',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.SNACKBAR,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0);
+    if (deepLink?.queryParameters['id'] != null && deepLink?.queryParameters['id'] != '' && deepLink?.queryParameters.isNotEmpty == true) { ///TODO test
+      String? linkroomid = deepLink?.queryParameters['id'];
+      String linkroomtopic;
+      String type;
+      bool linkch;
+      bool linkrh;
+      bool linkrm;
+      bool linkls;
+      bool linkyt;
+      bool linkKo;
+      String host;
+      try {
+        await FirebaseFirestore.instance.doc("Invcoblocked/$linkroomid/Blocked/$_userUid")
+            .get()
+            .then((doc) async {
+          if (doc.exists) {
+            final action = await Dialogs.infoDialog(
+                context,
+                "You can't join this meeting",
+                'The host of the meeting has blocked you from joining the meeting',
+                'Ok');
+          } else {
+            try {
+              await FirebaseFirestore.instance.doc("Meetings/$linkroomid")
+                  .get()
+                  .then((doc) async {
+                if (doc.exists) {
+                  await FirebaseFirestore.instance.collection('Meetings').doc(
+                      linkroomid).get().then((snapshot) async {
+                    setState(() {
+                      linkroomtopic = snapshot.data()?['meetName'];
+                      linkch = snapshot.data()['chat'];
+                      linkrh = snapshot.data()?['raise'];
+                      linkrm = snapshot.data()?['record'];
+                      linkls = snapshot.data()['live'];
+                      linkyt = snapshot.data()['yt'];
+                      linkKo = snapshot.data()['kick'];
+                      host = snapshot.data()['host'];
+                    });
+                    if (linkch == false) {
+                      setState(() {
+                        linkchatEnabled = false;
+                      });
+                    } else {
+                      setState(() {
+                        linkchatEnabled = true;
+                      });
+                    }
+                    if (linkrh == false) {
+                      setState(() {
+                        linkraiseEnabled = false;
+                      });
+                    } else {
+                      setState(() {
+                        linkraiseEnabled = true;
+                      });
+                    }
+                    if (linkrm == false) {
+                      setState(() {
+                        linkrecordEnabled = false;
+                      });
+                    } else {
+                      setState(() {
+                        linkrecordEnabled = true;
+                      });
+                    }
+                    if (linkls == false) {
+                      setState(() {
+                        linkliveEnabled = false;
+                      });
+                    } else {
+                      setState(() {
+                        linkliveEnabled = true;
+                      });
+                    }
+                    if (linkyt == false) {
+                      setState(() {
+                        linkYtEnabled = false;
+                      });
+                    } else {
+                      setState(() {
+                        linkYtEnabled = true;
+                      });
+                    }
+                    if (linkKo == false) {
+                      setState(() {
+                        linkKick = false;
+                      });
+                    } else {
+                      setState(() {
+                        linkKick = true;
+                      });
+                    }
+                    setState(() {
+                      linkHost = host;
+                    });
+                    if (host == _userEmail) {
+                      setState(() {
+                        roomText.text = linkroomid;
+                        subjectText.text = linkroomtopic;
+                      });
+                      _hostMeeting();
+                    } else {
+                      try {
+                        await FirebaseFirestore.instance.doc(
+                            "Invcoblocked/$linkroomid/Cohost/$_userUid")
+                            .get()
+                            .then((doc) async {
+                          if (doc.exists) {
+                            setState(() {
+                              type = 'cohost';
+                            });
+                          } else {
+                            await FirebaseFirestore.instance.doc(
+                                "Invcoblocked/$linkroomid/Invited/$_userUid")
+                                .get()
+                                .then((doc) async {
+                              if (doc.exists) {
+                                setState(() {
+                                  type = 'invited';
+                                });
+                              } else {
+                                setState(() {
+                                  type = 'join';
+                                });
+                              }
+                            });
+                            }
+                          });
+                      } catch (e) {
+                        print(e);
+                      }
+                      if (snapshot.data()['hasStarted'] == true) {
+                        setState(() {
+                          roomText.text = linkroomid;
+                          subjectText.text = linkroomtopic;
+                        });
+                        _joinLinkMeeting(type);
+                      } else {
+                        _notStarted(linkroomid, linkroomtopic, type);
+                      }
+                    }
+                  });
+                } else {
+                  noMeeting();
+                }
+              });
+            } catch (e) {
+              print(e);
+            }
+          }
+          });
+      } catch (e) {
+        print(e);
+      }
+    } else {
       Fluttertoast.showToast(
-          msg: 'Connecting...',
+          msg: 'Invalid meeting link',
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.SNACKBAR,
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.black,
           textColor: Colors.white,
           fontSize: 16.0);
-      if (deepLink.queryParameters['id'] != null && deepLink.queryParameters['id'] != '' && deepLink.queryParameters.isNotEmpty == true) { ///TODO test
-        String linkroomid = deepLink.queryParameters['id'];
-        String linkroomtopic;
-        String type;
-        bool linkch;
-        bool linkrh;
-        bool linkrm;
-        bool linkls;
-        bool linkyt;
-        bool linkKo;
-        String host;
-        try {
-          await FirebaseFirestore.instance.doc("Invcoblocked/$linkroomid/Blocked/$_userUid")
-              .get()
-              .then((doc) async {
-            if (doc.exists) {
-              final action = await Dialogs.infoDialog(
-                  context,
-                  "You can't join this meeting",
-                  'The host of the meeting has blocked you from joining the meeting',
-                  'Ok');
-            } else {
-              try {
-                await FirebaseFirestore.instance.doc("Meetings/$linkroomid")
-                    .get()
-                    .then((doc) async {
-                  if (doc.exists) {
-                    await FirebaseFirestore.instance.collection('Meetings').doc(
-                        linkroomid).get().then((snapshot) async {
-                      setState(() {
-                        linkroomtopic = snapshot.data()['meetName'];
-                        linkch = snapshot.data()['chat'];
-                        linkrh = snapshot.data()['raise'];
-                        linkrm = snapshot.data()['record'];
-                        linkls = snapshot.data()['live'];
-                        linkyt = snapshot.data()['yt'];
-                        linkKo = snapshot.data()['kick'];
-                        host = snapshot.data()['host'];
-                      });
-                      if (linkch == false) {
-                        setState(() {
-                          linkchatEnabled = false;
-                        });
-                      } else {
-                        setState(() {
-                          linkchatEnabled = true;
-                        });
-                      }
-                      if (linkrh == false) {
-                        setState(() {
-                          linkraiseEnabled = false;
-                        });
-                      } else {
-                        setState(() {
-                          linkraiseEnabled = true;
-                        });
-                      }
-                      if (linkrm == false) {
-                        setState(() {
-                          linkrecordEnabled = false;
-                        });
-                      } else {
-                        setState(() {
-                          linkrecordEnabled = true;
-                        });
-                      }
-                      if (linkls == false) {
-                        setState(() {
-                          linkliveEnabled = false;
-                        });
-                      } else {
-                        setState(() {
-                          linkliveEnabled = true;
-                        });
-                      }
-                      if (linkyt == false) {
-                        setState(() {
-                          linkYtEnabled = false;
-                        });
-                      } else {
-                        setState(() {
-                          linkYtEnabled = true;
-                        });
-                      }
-                      if (linkKo == false) {
-                        setState(() {
-                          linkKick = false;
-                        });
-                      } else {
-                        setState(() {
-                          linkKick = true;
-                        });
-                      }
-                      setState(() {
-                        linkHost = host;
-                      });
-                      if (host == _userEmail) {
-                        setState(() {
-                          roomText.text = linkroomid;
-                          subjectText.text = linkroomtopic;
-                        });
-                        _hostMeeting();
-                      } else {
-                        try {
-                          await FirebaseFirestore.instance.doc(
-                              "Invcoblocked/$linkroomid/Cohost/$_userUid")
-                              .get()
-                              .then((doc) async {
-                            if (doc.exists) {
-                              setState(() {
-                                type = 'cohost';
-                              });
-                            } else {
-                              await FirebaseFirestore.instance.doc(
-                                  "Invcoblocked/$linkroomid/Invited/$_userUid")
-                                  .get()
-                                  .then((doc) async {
-                                if (doc.exists) {
-                                  setState(() {
-                                    type = 'invited';
-                                  });
-                                } else {
-                                  setState(() {
-                                    type = 'join';
-                                  });
-                                }
-                              });
-                              }
-                            });
-                        } catch (e) {
-                          print(e);
-                        }
-                        if (snapshot.data()['hasStarted'] == true) {
-                          setState(() {
-                            roomText.text = linkroomid;
-                            subjectText.text = linkroomtopic;
-                          });
-                          _joinLinkMeeting(type);
-                        } else {
-                          _notStarted(linkroomid, linkroomtopic, type);
-                        }
-                      }
-                    });
-                  } else {
-                    noMeeting();
-                  }
-                });
-              } catch (e) {
-                print(e);
-              }
-            }
-            });
-        } catch (e) {
-          print(e);
-        }
-      } else {
-        Fluttertoast.showToast(
-            msg: 'Invalid meeting link',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.SNACKBAR,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.black,
-            textColor: Colors.white,
-            fontSize: 16.0);
 
-      }
-      print('Correct link');
     }
-  }
+    print('Correct link');
+    }
 
   void _notStarted(id, topic, type) {
     showDialog(
@@ -622,7 +620,7 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
     final QuickActions quickActions = QuickActions();
     quickActions.initialize((String shortcutType) {
       setState(() {
-        if (shortcutType != null) shortcut = shortcutType;
+        shortcut = shortcutType;
       });
       if (shortcutType == 'action_schedule') {
         _createNewNote();
@@ -992,9 +990,6 @@ class _MyAppState extends State<MyApp> with SingleTickerProviderStateMixin {
   }
 
   bool isNumeric(String s) {
-    if (s == null) {
-      return false;
-    }
     return int.tryParse(s) != null;
   }
 
